@@ -1,5 +1,5 @@
 ---
-title: STAT 3150 - Fall 2020
+title: STAT 3150 - Fall 2021
 type: docs
 BookToC: 2
 ---
@@ -8,9 +8,9 @@ BookToC: 2
 
 This is the course website for **STAT 3150: Statistical Computing**. This course aims to provide students with a broad overview of computational techniques used in modern statistical analysis. Throughout the course, students will:
 
- - Become proficient in R, to the level that they can analyse data using the tools from this class.
- - Be able to choose and produce an appropriate data visualization given the context.
+ - Become proficient in `R`, to the level that they can analyse data using the tools from this class.
  - Learn how to sample from various distributions, directly and indirectly.
+ - Design and conduct a simulation to study a particular statistical question.
  - Become familiar with several resampling techniques and know which one to use for a particular problem.
  - Be introduced to numerical methods and optimisation techniques.
 
@@ -19,8 +19,8 @@ This is the course website for **STAT 3150: Statistical Computing**. This course
   - Instructor: [Max Turgeon](https://maxturgeon.ca/)
   - Email: <max.turgeon@umanitoba.ca>
   - Office: 373 Machray Hall
-  - Website: <https://maxturgeon.ca/f20-stat3150/>
-  - Lectures: TR 10:00 AM--11:15 AM, via Webex
+  - Website: <https://maxturgeon.ca/f21-stat3150/>
+  - Lectures: TR 10:00 AM--11:15 AM, via Zoom
   - Office Hours:
     + By appointment **only**
     
@@ -48,7 +48,8 @@ The assessments for this course include:
 
 The course is expected to cover the following topics:
 
-  - Data Visualization (Chapter 5)
+  - Numerical Methods (Chapter 13)
+  - Introduction to Optimisation (Chapter 14)
   - Generating Random Variables (Chapter 3)
   - Monte Carlo Integration (Chapter 6)
   - Importance Sampling (Chapter 6)
@@ -56,8 +57,6 @@ The course is expected to cover the following topics:
   - Bootstrap and Jackknife (Chapter 8)
   - Resampling Applications (Chapter 9)
   - Permutation Tests (Chapter 10)
-  - Numerical Methods (Chapter 13)
-  - Introduction to Optimisation (Chapter 14)
 
 ## Statistical Software
 

@@ -1,6 +1,6 @@
-baseURL = "https://maxturgeon.ca/f20-stat3150/"
+baseURL = "https://maxturgeon.ca/f21-stat3150/"
 languageCode = "en-ca"
-title = "STAT 3150 - Fall 2020"
+title = "STAT 3150 - Fall 2021"
 theme = "book"
 ignoreFiles = ["_files$", "_cache$"]
 
