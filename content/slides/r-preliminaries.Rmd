@@ -1,0 +1,675 @@
+---
+title: "`R` preliminaries"
+draft: false
+source: true
+output: binb::metropolis
+fontsize: 12pt
+author: Max Turgeon
+institute: STAT 3150--Statistical Computing
+header-includes:
+  - \usefonttheme{professionalfonts}
+  - \usepackage{graphicx}
+  - \usepackage{tikzpagenodes}
+  - \usetikzlibrary{calc}
+  - \usepackage{caption}
+---
+
+```{r,setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(cache = FALSE, message = TRUE,
+                      linewidth = 50)
+
+set.seed(3150)
+```
+
+# Quick Introduction
+
+## Why use `R`?
+
+  - Modern statistics relies heavily on statistical computing.
+    + Simulation studies
+    + Data analysis
+  - `R` is a programming language that can be used on most platforms (Mac, Windows, Linux, Solaris, etc.)
+  - `R` is very flexible.
+    + It can be extended via `R` packages.
+  - `R` offers a powerful interface for analyzing data and producing high-quality plots.
+    + Extensive ecosystem of packages (unlike Julia)
+
+## Interacting with `R`
+
+  - You can interact with `R` in many ways:
+    + Through the command line
+    + In batch mode (i.e. running a script)
+    + Through an Integrated Development Interface (IDE)
+  - I strongly recommend using RStudio, which is the most powerful IDE for `R`.
+  
+## `R` is a **functional** programming language
+
+  - In `R`, functions are *first-class citizens*:
+    + They can be assigned to variables
+    + They can be passed as function arguments
+    + They can be returned by other functions
+  - Everything that happens in `R` is a function call.
+    + E.g. Control structures are implemented as functions too!
+  - Therefore, to become effective in `R`, learn to write functions
+
+## Every `R` object is a vector
+
+  - Even scalars are vectors of length 1
+  - There are two main types of vectors:
+    + **Atomic vectors**: each element is of the same primitive type (e.g. numeric, boolean, character)
+    + **Lists**: elements can be of any type, even lists!
+  - Matrices and arrays are also vectors, but with extra structure.
+    
+\begin{center}
+A very common pattern in \texttt{R} is to apply functions to vectors (as opposed to using \texttt{for} loops). A function that takes a vector as input is called \textbf{vectorized}.
+\end{center}
+
+## Example {.allowframebreaks}
+
+```{r}
+# Create a vector
+vect <- c(2, 6, 3, 5.5)
+
+# What is its mean?
+# Using for loops
+n <- length(vect)
+sum <- 0 # Initialize
+
+for (i in 1:n) { # R is 1-indexed!
+  sum <- sum + vect[i]
+}
+```
+
+```{r}
+mean <- sum/n
+mean
+```
+
+```{r}
+# In R, use vectorized functions
+# whenever possible
+mean(vect)
+```
+
+# Main object types
+
+## Variables
+
+  - Variables are ways to assign values (or objects) to names (or symbols).
+    + E.g. `vect <- c(1,2,3,4)`
+  - This allows us to write more robust and flexible code.
+  - Use meaningful names to make code *human-readable*. 
+    + Try to use `n.sample` or `sample_size` or `createMatrix`, instead of `n` or `nn`.
+    + Have a look at the Tidyverse style guide for `R`: https://style.tidyverse.org/
+  - Descriptive names make it easier to design, debug, and improve your code.
+
+
+## Assignment Operator
+
+  - The are several ways of assigning a value to a variable.
+
+```{r}
+# These are all equivalent
+x <- 10
+10 -> x
+x = 10
+assign("x", 10)
+```
+
+  - For readability of the code, the preferred option is `<-`. 
+    + Although `=` also works, it is usually reserved for function arguments.
+
+## Atomic vectors {.allowframebreaks}
+
+  - Recall: An atomic **vector** is a sequence of values, all of the same primitive type.
+
+```{r}
+x <- c(0, 5, 12, 8)
+x
+```
+
+  - The `c` function (for *concatenate*) returns a vector made from all the given arguments.
+
+```{r}
+y <- c(3, 2)
+c(x, y)
+```
+
+  - If elements are not all of same type, `R` tries to coerce them.
+  
+```{r}
+c(1, 2.5, "Stat", FALSE)
+```
+
+
+  - `R` has a built-in function to create sequences.
+
+```{r}
+seq(from = 1, to = 3, by = 0.5)
+# Equivalently
+seq(1, 3, by = 0.5)
+```
+
+```{r}
+# Decreasing sequences
+seq(1, 0, by = -0.2)
+```
+
+  - There is also a shorthand for sequences of consecutive integers:
+
+```{r}
+1:5
+1:(-2)
+```
+
+\vspace{1cm}
+
+  - Accessing one element of a vector:
+
+```{r}
+x[2]
+```
+
+ - Accessing more than one element:
+ 
+```{r}
+ x[c(1, 3)]
+```
+
+  - Accessing all but some elements:
+
+```{r}
+x[c(-2, -4)]
+```
+
+  - Accessing can also be done with a boolean vector:
+
+```{r}
+x_large <- x > 7
+x_large
+x[x_large]
+```
+
+  - Or using the `which` function (returns the *indices* of the elements of a boolean vector that are `TRUE`)
+
+```{r}
+which(x_large)
+x[which(x_large)]
+```
+
+## Comparisons and Logical Operators {.allowframebreaks}
+
+  - Comparisons are made like most other languages:
+
+```{r}
+7 <= 5
+7 != 5
+```
+
+\vspace{1in}
+
+```{r}
+# Even works with character values
+"abc" < "bca"
+```
+
+  - Recall that `=` is an assignment operator. Equality is checked with a double equal sign:
+
+```{r}
+7 == 5
+```
+
+  - For vectors of length > 1, comparisons are actually done component-wise:
+
+```{r}
+y <- rep(10, times = 4) # rep for repeat
+y
+x < y
+```
+
+  - Because of *recycling*, this is equivalent to:
+
+```{r}
+x < 10
+```
+
+  - The basic logical operators are `|` (or) and `&` (and). They also work component-wise:
+
+```{r}
+(x > 3) & (x < 10)
+(x < 3) | (x > 10)
+```
+
+## Vector arithmetic
+
+  - Arithmetic operators work component-wise:
+
+```{r}
+z <- 1:4
+x + z
+x * z
+z / x
+```
+
+## Recycling
+
+  - Binary operators (arithmetic, comparison, logical) are applied element-wise to vectors.
+  - `R` uses the concept of **recycling** when applying these operators to vectors of different lengths:
+    + repeat the shorter vector enough times to obtain a new vector of the same length as the longer vector
+    + apply the operator to the two longer vectors thus obtained
+    + if the length of the longer vector is not a multiple of the length of the shorter vector, `R` returns a warning.
+
+## Arrays and Matrices {.allowframebreaks}
+  
+  - **Arrays** are tables made from elements of the same type, like atomic vectors.
+  - You can create arrays from atomic vectors by specifying the dimensions.
+    + **Note**: `R` is column-major, which means it fills the matrix column by column (instead of by row)
+
+```{r}
+A_mat <- matrix(1:4, nrow = 2, ncol = 2)
+A_mat
+```
+
+  - If you prefer filling by row:
+
+```{r}
+B_mat <- matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE)
+B_mat
+```
+
+  - Array arithmetic (`+`, `*`, etc.) is done component-wise:
+  
+```{r}
+A_mat * B_mat
+```
+
+
+## Accessing elements of arrays {.allowframebreaks}
+
+  - Accessing elements of arrays can be done by proper indexing of the array itself or by indexing the underlying vector:
+
+```{r}
+A_mat[1, 2]
+A_mat[3]
+```
+
+- You can also select a full row or columns:
+
+```{r}
+B_mat[, 2]
+```
+
+## Basic matrix operations {.allowframebreaks}
+
+  - Some basic operations: `t`, `det`, `%*%`.  
+  - Matrix multiplication requires the dimension of the involved matrices to match.  
+
+```{r}
+B_mat %*% t(A_mat)
+```
+ 
+  - `R` treats vectors as column-vectors or row-vectors, as needed.
+
+```{r}
+A_mat %*% c(2, 3)
+c(5, 1) %*% A_mat
+```
+
+  - Matrix inversion is done with `solve`:
+
+```{r}
+solve(A_mat)
+```
+
+## Lists {.allowframebreaks}
+
+  - Unlike atomic vectors, **lists** are sequences of values, not necessarily all of the same type.
+
+```{r}
+course <- list(3150, "Statistical Computing", 
+               FALSE, 3.0)
+course
+```
+
+  - Lists are vectors, and they can be subsetted using `[ ]`.
+
+```{r}
+course[4]
+```
+
+  - **Note**: the above is still a list! To extract the element, use double brackets:
+
+```{r}
+course[[4]]
+```
+
+  - Use `c` to add elements to a list (just like atomic vectors).
+
+```{r}
+c("STAT", course)
+```
+
+## Names for lists {.allowframebreaks}
+
+  - Very often, elements of a list will be given names.
+
+```{r}
+names(course) <- c("Number", "Title", 
+                   "Lab", "Credit_hours")
+course
+```
+
+  - There is a shortcut for using names with lists:
+
+```{r}
+course[["Title"]]
+course$Title
+```
+
+  - Lists can be created with names.
+
+```{r}
+other_course <- list(Number = 4150, 
+                     Title = "Bayesian Statistics", 
+                     Lab = FALSE, Credit_hours = 3.0)
+other_course
+```
+
+- A named element can be added to a list.
+
+```{r}
+course$Dept <- "STAT"
+course
+other_course[["Dept"]] <- "STAT"
+```
+
+## Data Frames {.allowframebreaks}
+
+  - A **data frame** is a list of vectors that are all of the same length. Importantly, the vectors *can be of different types*.  
+  - Data frames are how `R` models datasets:  
+    + Columns are variables,  
+    + Rows are units or subjects.  
+
+```{r}
+courses <- data.frame(Dept = c("STAT", "STAT"), 
+                      Number = c(3150, 4150), 
+                      Title =c("Statistical Computing",
+                                "Bayesian Statistics"),
+                      Lab = c(FALSE, FALSE), 
+                      Credit_hours = c(3.0, 3.0))
+```
+
+
+```{r}
+courses
+```
+
+  - Elements of data frames can be accessed, like matrices, by indices or names.
+
+```{r}
+courses[2, "Title"]
+```
+
+  - The shortcut `$` works with the columns of data frames:
+
+```{r}
+courses$Lab
+```
+
+# Control Structures
+
+## Conditional Statements {.allowframebreaks}
+
+- The function **if** is used to control which of two blocks of code are executed.  
+- The typical syntax is:
+
+```{r, eval=FALSE}
+if (condition) {
+  # Block of code to be executed 
+  # when condition is TRUE
+} else {
+  # Another block of code to be executed 
+  # when condition is FALSE
+}
+```
+
+ - Braces are not necessary when a block contains only one line of code, but it is good practice to use the above syntax.  
+ - The `else` statement is not required.
+ 
+## Example 
+
+```{r}
+# Sample 1 value from a standard normal
+x <- rnorm(1)
+if (x < 0) {
+  message("The observation x is negative.")
+} else {
+  message("The observation x is positive.")
+}
+```
+
+## Conditional Statements (cont'd) {.allowframebreaks}
+
+  - It is also possible to have more than one else statement:
+
+```{r}
+x <- rnorm(10)
+loc_measure <- "mid_point"
+```
+
+
+```{r}
+if (loc_measure == "mean") {
+  mean(x)
+} else if (loc_measure == "median") {
+  median(x)
+} else if (loc_measure == "mid_point") {
+  0.5*(min(x) + max(x))
+} else {
+  stop(paste("You have to choose between mean,",
+             "median and mid_point."))
+}
+```
+
+  - The above is referred to as a *nested if* structure.
+  - The `switch` function can also be used in the above setting:
+
+```{r, error = TRUE}
+loc_measure <- "truncated_mean"
+switch(loc_measure,
+       "mean" = mean(x),
+       "median" = median(x),
+       "mid_point" = 0.5*(min(x) + max(x)),
+       stop(paste("You have to choose between mean,\n",
+             "median and mid_point."), call. = FALSE)
+       )
+```
+
+## `for` Loop {.allowframebreaks}
+
+  - The `for` statement specifies that a certain operation should be repeated a *fixed* number of times.  
+  - The syntax is:
+
+```{r, eval = FALSE}
+for (element in vector) {
+  # Block of code to be repeated
+  # once for each element of vector
+}
+```
+
+## Example
+
+```{r}
+for (k in 3:0) {
+  message(k)
+  if (k == 0) message("Blast off!")
+}
+```
+
+## Exercise
+
+Approximate a geometric sum using a finite number $N$ of terms:
+
+$$S = \sum_{k=0}^{\infty} \left( \frac{1}{2} \right)^k \approx \sum_{k=0}^{N-1} \left( \frac{1}{2} \right)^k.$$
+
+## Solution {.allowframebreaks}
+
+```{r}
+N <- 10
+approx <- 0
+for (k in 0:(N - 1)) {
+  # update current approx by adding next term
+  approx <- approx + 2^{-k}     
+}
+approx
+```
+
+  - **Note**: it is more efficient to use vectorized functions:
+
+```{r}
+sum(0.5^(0:(N-1)))
+```
+
+## `while` Loop
+
+  - The *while* loop repeats an expression for as long as a condition holds.
+  - The syntax is:
+
+```{r, eval = FALSE}
+while (condition) {
+  # Block of code to be repeated 
+  # as long as condition is TRUE
+}
+```
+
+## Example {.allowframebreaks}
+
+```{r}
+num_flips <- 0
+flip <- "tails"
+
+while (flip == "tails") {
+  # Flip a coin
+  flip <- sample(c("tails", "heads"), size = 1)
+  num_flips <- num_flips + 1
+}
+```
+
+\vspace{2in}
+
+```{r}
+# How many flips?
+num_flips
+```
+
+## Example {.allowframebreaks}
+
+  - What if we want to approximate the geometric sum within $\epsilon = 10^{-7}$ of the true value of $S$?
+  
+```{r}
+approx <- 0
+current_err <- 2
+k <- 0
+while(current_err > 10^(-7)) {
+  approx <- approx + 2^(-k)
+  current_err <- 2 - approx
+  k <- k + 1
+}
+```
+
+```{r}
+# How many terms?
+k
+```
+
+## Creating functions {.allowframebreaks}
+
+  - Creating new functions is an important part of programming.  
+  - This is done with the function `function` and through assignment.
+
+```{r, eval = FALSE}
+new_function <- function(arg1, arg2 = def_val) {
+  # Block of code to be executed using the arguments
+  return(value)
+}
+```
+
+  - This creates a function named `new_function` that can then be used like any other `R` function. 
+  - The function has two arguments:
+    + `arg1` is required
+    + `arg2` has the default value `def_val`
+  - The function will return the output of the last statement, unless it hits `return` (after which it exits).
+
+## Example {.allowframebreaks}
+
+  - Consider the following piecewise linear function:
+
+$$f(x) = \begin{cases}
+1 & \text{if } x<-1 \text{ or } x>1, \\
+-x & \text{if } -1 \leq x <0, \\
+x & \text{if } 0 \leq x \leq 1.
+\end{cases}$$
+
+  - In `R`, this can be defined as follows:
+  
+```{r}
+fun <- function(x) {
+  if ((x >= -1) & (x < 0)) {
+    value <- -x
+  } else if ((x >= 0) & (x <= 1)) {
+    value <- x
+  } else value <- 1
+  
+  return(value)
+}
+```
+
+\vspace{1cm} 
+
+```{r}
+c(fun(-3), fun(-0.3), fun(0.4), fun(1.5))
+```
+
+  - Equivalently, we can define
+
+```{r}
+fun_cleaner <- function(x) {
+  if ((x >= -1) & (x < 0)) {
+    return(-x)
+  }
+  if ((x >= 0) & (x <= 1)) {
+    return(x)
+  }
+  return(1)
+}
+```
+
+```{r}
+c(fun_cleaner(-3), fun_cleaner(-0.3), 
+  fun_cleaner(0.4), fun_cleaner(1.5))
+```
+
+## Exercise
+
+  - Implement the following, more general, function, where $a > 0$ is arbitrary:
+  
+$$f_a(x) = \begin{cases}
+a & \text{if } x < a, \text{ or } x>a, \\
+-x & \text{if } -a \leq x <0, \\
+x & \text{if } 0 \leq x \leq a,
+\end{cases}$$
+
+  - *Hint*: Use a second argument to the function.

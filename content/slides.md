@@ -7,6 +7,10 @@ type: docs
 
 If you are registered for the course, you can find the material on [UM Learn](https://universityofmanitoba.desire2learn.com/d2l/login).
 
+  - [Course Overview](Introduction.pdf)
+  - [`R` preliminaries](r-preliminaries.pdf)
+    + [`R` code](r-preliminaries.R)
+
 <!--
   - [Course Overview](overview.pdf)
   - [Data Visualization](visualization.pdf)
