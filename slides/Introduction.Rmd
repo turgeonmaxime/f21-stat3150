@@ -22,21 +22,15 @@ knitr::opts_chunk$set(cache=TRUE)
 
 ## Lecture schedule
 
-We meet twice a week on WebEx:
+We meet twice a week on Zoom:
 
   - **Tuesday** 10am to 11:20am
     + Traditional Lecture
   - **Thursday** 10am to 11:20am
-    + Discussion & Question Period
+    + Focus on Discussion & Question/Group activities
     
 Both weekly meetings will be **recorded** and available on UM Learn
 
-## Personal Work
-
-  - We won't have time to cover all the material with only one lecture per week.
-    + You're responsible for covering the *other half* of the material on your own.
-    + Mainly through **interactive tutorials** (more on this later), but keep an eye on UM Learn for quizzes, extra course notes, examples, exercises, etc.
-    
 ## Textbook
 
 ![](../../static/images/Rizzo.png)
@@ -46,7 +40,7 @@ Both weekly meetings will be **recorded** and available on UM Learn
   - **Goal**: More, lower-stake assessments (instead of a couple high-stake exams).
     + 6 assignments (10% each)
     + 2 midterms and 1 final (15% each)
-    + Class participation (5%)
+    + UM Learn quizzes (5%)
 
 ## Assignments
 
@@ -63,15 +57,7 @@ Both weekly meetings will be **recorded** and available on UM Learn
     + Concepts will be introduced as needed, and through examples.
     + See UM Learn for extra reading material on `R`.
   - **Important**: Let me know if some of the code isn't clear!
-    + In particular, Thursdays can be used to go into more detail.
-
-## Class participation
-
-  - Two equally weighted components: 
-    + Summary quizzes on UM Learn (one per module + academic integrity)
-    + In-class participation/Discussion groups
   
-
 ## What is statistical computing? {.allowframebreaks}
 
   - At a basic level, statistical computing is *using computational tools* to solve *statistical problems*.
@@ -91,5 +77,4 @@ Both weekly meetings will be **recorded** and available on UM Learn
   - I don't think the assumptions are met. *How do I get valid confidence intervals and hypothesis tests?*
     + Use bootstrap and/or permutation tests.
   - My estimator has no closed-form solution. *How do I compute it?*
-    + Use optimisation methods.
-
+    + Use optimization methods.
