@@ -32,7 +32,12 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
                       linewidth = 50)
 ```
 
-## Maximum Likelihood {.allowframebreaks}
+## Lecture Objectives
+
+  - Given a distribution for the data, write down the likelihood function and maximize it.
+  - Understand likelihood function for binned data.
+
+## Motivation
 
   - **Maximum Likelihood Estimation** is a general strategy for finding "good" estimators that was first proposed by R.A. Fisher.
   - I will give the general definition, but a more thorough discussion is beyond the scope of today's lecture.
@@ -43,19 +48,19 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
     + $S_\theta$ is the parameter space, i.e. the set of possible values for $\theta$.
     + $f(x;\theta)$ will denote the density function (or PMF) of the data.
 
-### Definition
+## Definition
 
 The **likelihood function** $L(\theta\mid \mathbf{X})$ is the joint distribution of the observations considered as a function of $\theta$:
 $$L(\theta\mid \mathbf{X}) = \prod_{i=1}^n f(X_i;\theta).$$
 
-A value $\hat{\theta}$ that maximises $L(\theta\mid \mathbf{X})$, in other words
+A value $\hat{\theta}$ that maximizes $L(\theta\mid \mathbf{X})$, in other words
 $$L(\hat{\theta}\mid \mathbf{X}) = \max_{\theta\in S_\theta} L(\theta\mid \mathbf{X}),$$
 is a **Maximum Likelihood Estimate** of $\theta$.
 
 ## Remarks
 
   - In general, the MLE may not be unique. We need to make some assumptions (called *identifiability* assumptions) to ensure uniqueness.
-  - Since $\log$ is a monotone increasing function, maximising $L(\theta\mid \mathbf{X})$ is equivalent to maximising 
+  - Since $\log$ is a monotone increasing function, maximizing $L(\theta\mid \mathbf{X})$ is equivalent to maximizing 
   $$\ell(\theta\mid \mathbf{X}) = \log L(\theta\mid \mathbf{X}).$$
     + Why would this be helpful?
     
@@ -73,7 +78,7 @@ L(\theta\mid \mathbf{X}) &= \prod_{i=1}^n f(X_i;\theta)\\
 
   - By taking the log, we get the log-likelihood:
   $$\ell(\theta\mid \mathbf{X}) = -\frac{n}{2}\log(2\pi\sigma^2) - -\frac{1}{2\sigma^2}\sum_{i=1}^n(X_i - \mu)^2.$$
-  - We need to maximise this expression. 
+  - We need to maximize this expression. 
     + Take derivative.
     + Numerical methods?
     
