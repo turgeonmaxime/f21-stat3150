@@ -10,6 +10,10 @@ If you are registered for the course, you can find the material on [UM Learn](ht
   - [Course Overview](Introduction.pdf)
   - [`R` preliminaries](r-preliminaries.pdf)
     + [`R` code](r-preliminaries.R)
+  - [Numerical Methods](numerical-methods.pdf)
+    + [`R` code](numerical-methods.R)
+  - [Maximum Likelihood](maximum-likelihood.pdf)
+    + [`R` code](maximum-likelihood.R)
 
 <!--
   - [Course Overview](overview.pdf)
