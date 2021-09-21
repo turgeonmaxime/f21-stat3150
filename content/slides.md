@@ -14,7 +14,8 @@ If you are registered for the course, you can find the material on [UM Learn](ht
     + [`R` code](numerical-methods.R)
   - [Maximum Likelihood](maximum-likelihood.pdf)
     + [`R` code](maximum-likelihood.R)
-
+  - [Optimization](optimization.pdf)
+    + [`R` code](optimization.R)
 <!--
   - [Course Overview](overview.pdf)
   - [Data Visualization](visualization.pdf)
