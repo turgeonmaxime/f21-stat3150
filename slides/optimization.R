@@ -121,7 +121,7 @@ fit <- glm(satell ~ weight, data = crabs,
 coef(fit)
 
 
-## ---- message = FALSE---------------------------------------------------------
+## ---- message = FALSE, echo = FALSE-------------------------------------------
 library(tidyverse)
 log_lik <- function(row) {
     mu_vec <- exp(row$beta0 + row$beta1*x_vec)
@@ -134,11 +134,11 @@ data_plot <- expand.grid(beta0 = seq(-2, 0, 0.1),
                    .to = "loglik")
 
 
-## ---- message = FALSE---------------------------------------------------------
-head(data_plot)
+## ---- message = FALSE, echo = FALSE, eval = FALSE-----------------------------
+## head(data_plot)
 
 
-## ---- message = FALSE---------------------------------------------------------
+## ---- message = FALSE, echo = FALSE-------------------------------------------
 data_plot %>% 
   ggplot(aes(x = beta0, y = beta1,
              z = loglik)) + 

@@ -1,5 +1,5 @@
 ---
-title: "Optimisation"
+title: "Optimization"
 draft: false
 source: true
 output: binb::metropolis
@@ -41,25 +41,25 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 ## Motivation
 
-  - **Optimisation** is a very old and broad field of applied mathematics.
+  - **Optimization** is a very old and broad field of applied mathematics.
     + It is older than calculus: see Heron's problem.
   - It plays an important role in statistics, but also computational biology, economics, mathematical finance, etc.
-  - Our discussion will necessarily be brief, but I will try to give a sample of the types of statistical problems that can be solved using optimisation.
+  - Our discussion will necessarily be brief, but I will try to give a sample of the types of statistical problems that can be solved using optimization.
     + For more details, I recommend *Optimization* (2013) by Kenneth Lange.
     
 ## Problem statement
 
-  - In very general terms, the basic optimisation problem is as follows.
+  - In very general terms, the basic optimization problem is as follows.
   - Let $A$ be a set (e.g. a subset of $\mathbb{R}^n$, a set of integers, etc.), and let $f$ be a real-valued function on $A$.
   - We are looking for a value $x_0\in A$ such that:
-    + **Minimisation**: $f(x_0) \leq f(x)$ for all $x\in A$.
-    + **Maximisation**: $f(x_0) \geq f(x)$ for all $x\in A$.
+    + **Minimization**: $f(x_0) \leq f(x)$ for all $x\in A$.
+    + **Maximization**: $f(x_0) \geq f(x)$ for all $x\in A$.
   - The set $A$ can be defined via a combination of equality and inequality constraints.
     + For a multinomial model, we want $K$ probabilities $p_k$ such that $0\leq p_k \leq 1$ and $\sum_{k=1}^K p_k = 1$.
     
 ## Lasso regression
 
-  - In linear regression, we find an estimate $\hat{\beta}$ by minimising least squares:
+  - In linear regression, we find an estimate $\hat{\beta}$ by minimizing least squares:
   $$\hat{\beta} = \argmin_{\beta \in \mathbb{R}^p} \sum_{i=1}^n \left(Y_i - \mathbf{X}_i^T \beta\right)^2.$$
   - In lasso regression, we add a constraint on the L1 norm of $\beta$:
   $$\hat{\beta}_{Lasso} = \argmin_{\beta \in \mathbb{R}^p} \sum_{i=1}^n \left(Y_i - \mathbf{X}_i^T \beta\right)^2, \quad \sum_{j=1}^p \lvert \beta_j \rvert \leq \lambda.$$
@@ -75,24 +75,24 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 ## Mixture models
 
-  - Recall from earlier this semester *mixture models*:
+  - A *mixture model* can be defined as follows:
   $$F(x) = \sum_{k=1}^K \pi_k F_k(x),$$
   where $F_k$ is a distribution function for all $k$ and $\sum_{k=1}^K \pi_k = 1$.
-  - The likelihood can be difficult to maximise directly.
+  - The likelihood can be difficult to maximize directly.
   - Instead, we typically use the **Expectation-Maximization algorithm**.
 
 ## Machine learning
 
   - A common goal in machine learning is *prediction*: given a vector of features $\mathbf{X}$, find a function $f$ such that 
   $$L(Y, f(\mathbf{X}))$$
-  is minimised. 
+  is minimized. 
   - Here $L(Y, \cdot)$ is a *loss function*. For example:
     + $L(Y, f(\mathbf{X})) = (Y - f(\mathbf{X}))^2$
     + $L(Y, f(\mathbf{X})) = \lvert Y - f(\mathbf{X})\rvert$
 
 ## Newton-Raphson method {.allowframebreaks}
 
-  - The Newton-Raphson method is the only optimisation technique we will discuss.
+  - The Newton-Raphson method is the only optimization technique we will discuss in this module.
     + It is a very important technique and serves as motivation for more advanced methods.
   - Suppose we have a twice differentiable function $f: A \to \mathbb{R}$, where $A\subseteq \mathbb{R}^n$. We want to find the maximum of $f$ on $A$.
   - We can approximate $f$ using a Taylor expansion:
@@ -315,7 +315,9 @@ fit <- glm(satell ~ weight, data = crabs,
 coef(fit)
 ```
 
-```{r, message = FALSE}
+## Visualizing Newton-Raphson {.allowframebreaks}
+
+```{r, message = FALSE, echo = FALSE}
 library(tidyverse)
 log_lik <- function(row) {
     mu_vec <- exp(row$beta0 + row$beta1*x_vec)
@@ -329,12 +331,12 @@ data_plot <- expand.grid(beta0 = seq(-2, 0, 0.1),
 ```
 
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo = FALSE, eval = FALSE}
 head(data_plot)
 ```
 
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo = FALSE}
 data_plot %>% 
   ggplot(aes(x = beta0, y = beta1,
              z = loglik)) + 
