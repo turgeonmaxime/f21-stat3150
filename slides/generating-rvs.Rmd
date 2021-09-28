@@ -85,7 +85,7 @@ p = 1 - \exp(-\lambda x) &\Rightarrow \exp(-\lambda x) = 1 - p\\
 lambda <- 1
 # We want 1000 samples
 n <- 1000
-unif_vars <- runif(1000)
+unif_vars <- runif(n)
 exp_vars <- -log(1 - unif_vars)/lambda
 ```
 
@@ -158,12 +158,12 @@ points(x = c(0, 1), y = c(0.4, 1), pch = 19)
 
   - As we can see, we have
   $$ F^{-1}(u) = \begin{cases} 0 &\qquad u \leq 1 - p,\\ 1 &\qquad u > 1 - p.\end{cases}$$
-  - In other words, we sample $U$. If it is less than $p$, we set $X = 0$; else, we set $X = 1$.
+  - In other words, we sample $U$. If it is less than $1 - p$, we set $X = 0$; else, we set $X = 1$.
   
 ```{r}
 p <- 0.6
 n <- 1000
-unif_vars <- runif(1000)
+unif_vars <- runif(n)
 # as.numeric turns FALSE into 0 
 # and TRUE into 1
 bern_vars <- as.numeric(unif_vars > 1 - p)
@@ -180,7 +180,7 @@ c(p, p*(1 - p))
   - Inverse transform is just one type of transformation!
   - We can use relationships between distributions to generate random variates. For example:
     - If $Z\sim N(0, 1)$, then $Z^2 \sim \chi^2(1)$.
-    - If $V_1, \ldots, V_p \sim \chi^2(1)$, then $\sum_{i=1}^p \sim \chi^2(p)$.
+    - If $V_1, \ldots, V_p \sim \chi^2(1)$, then $\sum_{i=1}^p V_i\sim \chi^2(p)$.
     - If $U \sim \chi^2(p)$ and $V\sim\chi^2(q)$, then
     $$\frac{U/p}{V/q} \sim F(p, q).$$
     
