@@ -1,0 +1,11 @@
+---
+title: "Practice problems--{{ replace .Name "-" " " | title }}"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+

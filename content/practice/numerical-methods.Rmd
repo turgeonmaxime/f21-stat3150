@@ -1,0 +1,50 @@
+---
+title: "Practice problems---Numerical Methods"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+Recall that the secant method starts with two initial values $x_0\neq x_1$ and constructs a sequence:
+
+$$x_n = x_{n-1} - f(x_{n-1})\frac{x_{n-1} - x_{n-2}}{f(x_{n-1}) - f(x_{n-2})}.$$
+
+Show that the secant iterations can be redefined as
+$$ x_n = \frac{x_{n-1}f(x_{n-2}) - x_{n-2}f(x_{n-1})}{f(x_{n-2}) - f(x_{n-1})}.$$
+
+## Problem 2
+
+This problem is adapted from Süli & Mayers *An Introduction to Numerical Analysis* (2003). They define a variant of the secant method as follows. Define two sequences $u_n$ and $v_n$ such that all the values $f(u_n)$, $n=0, 1, 2, \ldots$, have one sign, and all the values $f(v_n)$, $n = 0, 1, 2, \ldots$, have the opposite sign. From these two sequences, we define 
+$$w_n = \frac{u_n f(v_n) - v_n f(u_n)}{f(v_n) - f(u_n)}, \qquad n = 0, 1, 2, \ldots$$
+Finally, define $u_{n+1} = w_n,v_{n+1} = v_n$ if $f(w_n)$ has the same sign as $f(u_n)$, and otherwise define $u_{n+1} = u_n, v{n+1} = w_n$.
+
+In other words, start with two initial values $u_0,v_0$ such that $f(u_0), f(v_0)$ have different signs, compute $w_0$ and update both sequences depending on the sign of $f(w_0)$ and make sure the sign constrain is satisfied for both sequences. Continue until convergence.
+
+Implement this algorithm in `R`, and use your implementation to find the root of the function 
+$$f(x) = \exp(x) - x - 2.$$
+
+You can use $u_0 = 0, v_0 = 2$.
+
+## Problem 3
+
+In this problem, you will implement Brent's method. Recall the algorithm from the lecture.
+
+### Algorithm
+
+Start with interval $[a, b]$ and continuous function $f(x)$. The values $f(a),f(b)$ have opposite signs.
+
+  1. Define a third point $(c, f(c))$, where $c$ is the value at which a linear interpolation crosses the x-axis. Depending on the sign of $f(c)$, we know the solution $f(x) = 0$ falls inside the interval $(a,c)$ or $(c,b)$.
+  2. Fit a sideways parabola to all three points, and find the intersection $x_1$ with the x-axis. If $x_1$ falls outside the interval from Step 1, replace $x_1$ by the midpoint of the interval (i.e. bisection).
+  3. Repeat until convergence.
+  
+Answer the following questions.
+
+  a. Look at the help page for the function `poly_calc` in the package `PolynomF`. Explain how you can use it to find the *sideways* parabola passing through three points $(x_1, f(x_1))$, $(x_2, f(x_2))$, and $(x_3, f(x_3))$.
+  b. Assume `poly_fun` is the output of `poly_calc` as used in part a. to fit a sideways parabola. Explain how you can use `poly_fun` to compute the value `x` at which the parabola crosses the $x$-axis.
+  c. Use the answers from the previous two parts to implement Brent's algorithm in `R`. Use your implementation to find the root of the function $f(x) = \exp(x) - x - 2$. You can use the interval $[0, 2]$.
+  d. Compare your answer with the one you get from using `uniroot` (both the root and the number of iterations). Are they the same?
+  e. Look at the Wikipedia page on Brent's algorithm: https://en.wikipedia.org/wiki/Brent%27s_method. Describe how the actual algorithm differs from the description above. This is why we use the implementation from `uniroot`!

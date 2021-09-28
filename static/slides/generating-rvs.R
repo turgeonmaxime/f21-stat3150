@@ -25,7 +25,7 @@ runif(5)
 lambda <- 1
 # We want 1000 samples
 n <- 1000
-unif_vars <- runif(1000)
+unif_vars <- runif(n)
 exp_vars <- -log(1 - unif_vars)/lambda
 
 
@@ -69,7 +69,7 @@ points(x = c(0, 1), y = c(0.4, 1), pch = 19)
 ## -----------------------------------------------------------------------------
 p <- 0.6
 n <- 1000
-unif_vars <- runif(1000)
+unif_vars <- runif(n)
 # as.numeric turns FALSE into 0 
 # and TRUE into 1
 bern_vars <- as.numeric(unif_vars > 1 - p)
