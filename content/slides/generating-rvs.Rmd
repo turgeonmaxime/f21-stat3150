@@ -75,11 +75,11 @@ To generate random variates from $F$:
   - Let $X$ follow an exponential distribution with parameter $\lambda$:
   $$ F(x) = 1 - \exp(-\lambda x).$$
   - Since $X$ is continuous, the quantile function is the inverse of $F$:
-  \begin{align*}
-  p = 1 - \exp(-\lambda x) &\Rightarrow \exp(-\lambda x) = 1 - p\\
-    &\Rightarrow -\lambda x = \log(1 - p)\\
-    &\Rightarrow x = \frac{-\log(1 - p)}{\lambda}.\\
-  \end{align*}
+\begin{align*}
+p = 1 - \exp(-\lambda x) &\Rightarrow \exp(-\lambda x) = 1 - p\\
+  &\Rightarrow -\lambda x = \log(1 - p)\\
+  &\Rightarrow x = \frac{-\log(1 - p)}{\lambda}.\\
+\end{align*}
 
 ```{r}
 lambda <- 1
@@ -102,10 +102,39 @@ abline(a = 0, b = 1)
 
   - Therefore $\frac{-\log(U)}{\lambda}$ also follows an $Exp(\lambda)$ distribution.
   
+## Exercise
+
+Compute the quantile function for the Cauchy distribution ${\sf Cauchy}(\theta, \gamma)$ with CDF
+
+$$ F(x) = \frac{1}{\pi}\mathrm{arctan}\left(\frac{x - \theta}{\gamma}\right) + \frac{1}{2}.$$
+
+Use the inverse transform to generate 5 random variates from ${\sf Cauchy}(0, 1)$.
+
+## Solution {.allowframebreaks}
+
+\begin{align*}
+p = \frac{1}{\pi}\mathrm{arctan}\left(\frac{x - \theta}{\gamma}\right) + \frac{1}{2} &\Rightarrow \pi(p - 0.5) = \mathrm{arctan}\left(\frac{x - \theta}{\gamma}\right)\\
+  &\Rightarrow \tan\left(\pi(p - 0.5)\right) = \frac{x - \theta}{\gamma}\\
+  &\Rightarrow \gamma \tan\left(\pi(p - 0.5)\right) = x - \theta \\
+  &\Rightarrow x = \gamma \tan\left(\pi(p - 0.5)\right) + \theta.
+\end{align*}
+
+**Note**: We always have $\pi(p-0.5) \in \left(-\frac{\pi}{2}, \frac{\pi}{2}\right)$ for $p\in(0,1)$.
+
+```{r}
+invcdf_cauchy <- function(p, theta = 0,
+                          gamma = 1) {
+  gamma*tan(pi*(p - 0.5)) + theta
+}
+unif_vars <- runif(5)
+invcdf_cauchy(unif_vars)
+```
+
 ## Inverse Transform---Discrete Edition
 
 ```{r echo = FALSE, fig.cap="From Wikipedia"}
 library(cowplot)
+library(magick)
 fig_svg <- cowplot::ggdraw() + cowplot::draw_image("../../static/images/Generalized_inversion_method.svg")
 plot(fig_svg)
 ```
@@ -187,66 +216,6 @@ qqplot(f_vars, qf(ppoints(1000), p, q))
 # Add diagonal line
 abline(a = 0, b = 1)
 ```
-
-## Mixture of distributions {.allowframebreaks}
-
-  - We say $X$ with distribution function $F$ follows a (discrete) **mixture of distributions** if we can write
-  $$F(x) = \sum_{k=1}^K \pi_k F_k(x),$$
-  where $F_k$ is a distribution function for all $k$ and $\sum_{k=1}^K \pi_k = 1$.
-    + For example, the distribution of adult heights can be well-approximated by a mixture of two normal distributions with equal weights.
-
-### Algorithm
-
-To sample from $F = \sum_{k=1}^K \pi_k F_k$:
-
-  1. Select a component $k$ by sampling from a multinomial distribution with probabilities $(\pi_1, \ldots, \pi_K)$.
-  2. Sample from $F_k$.
-  
-## Example {.allowframebreaks}
-
-  - Assume that adult heights for **male** follows a normal distribution with mean 175cm and standard deviation 7cm.
-  - Assume that adult heights for **female** follows a normal distribution with mean 160cm and standard deviation 7cm.
-  - Finally assume that we have an equal proportion of male and female.
-  - How can we sample from the distribution of adult heights?
-  
-```{r}
-height_vars <- replicate(1000, {
-  sex <- sample(c("M", "F"), size = 1,
-                prob = c(0.5, 0.5))
-  if (sex == "M") {
-    height <- rnorm(1, mean = 175, sd = 7)
-  }
-  if (sex == "F") {
-    height <- rnorm(1, mean = 160, sd = 7)
-  }
-  return(height)
-})
-```
-
-```{r}
-plot(density(height_vars), ylim = c(0, 0.06))
-# Add component densities
-x_seq <- seq(140, 200, length.out = 100)
-lines(x_seq, dnorm(x_seq, 175, 7), col = "red")
-lines(x_seq, dnorm(x_seq, 160, 7), col = "green")
-```
-
-```{r}
-# Sample with less code
-sex <- sample(c(1, 2), size = 1000,
-              replace = TRUE, 
-              prob = c(0.5, 0.5))
-height_vars <- rnorm(1000, c(175, 160)[sex], 7)
-c(mean(height_vars), sd(height_vars))
-```
-
-## Summary
-
-  - When we can compute the quantile function, the inverse transform is simple to implement.
-    + But it can be hard to compute!
-  - We can leverage relationships between distributions to transform one random variate into another.
-  - **Mixture distributions** are a flexible way to model heterogeneous data, and it's "easy" to sample from them.
-    + **Note**: Do not confuse *convolutions* (i.e. adding random variables) with *mixtures* (i.e. convex combination of distribution functions).
 
 ## Acceptance-Reject Method {.allowframebreaks}
 
@@ -369,3 +338,10 @@ while (k < n) {
 # How many iterations did we need this time?
 j
 ```
+
+## Summary
+
+  - When we can compute the quantile function, the inverse transform is simple to implement.
+    + But it can be hard to compute!
+  - We can leverage relationships between distributions to transform one random variate into another.
+  - Accept-reject can be used when we have a bounding density.

@@ -38,8 +38,18 @@ qqplot(exp_theo, exp_vars)
 abline(a = 0, b = 1)
 
 
+## -----------------------------------------------------------------------------
+invcdf_cauchy <- function(p, theta = 0,
+                          gamma = 1) {
+  gamma*tan(pi*(p - 0.5)) + theta
+}
+unif_vars <- runif(5)
+invcdf_cauchy(unif_vars)
+
+
 ## ----echo = FALSE, fig.cap="From Wikipedia"-----------------------------------
 library(cowplot)
+library(magick)
 fig_svg <- cowplot::ggdraw() + cowplot::draw_image("../../static/images/Generalized_inversion_method.svg")
 plot(fig_svg)
 
@@ -100,37 +110,6 @@ f_vars <- replicate(1000, {
 qqplot(f_vars, qf(ppoints(1000), p, q))
 # Add diagonal line
 abline(a = 0, b = 1)
-
-
-## -----------------------------------------------------------------------------
-height_vars <- replicate(1000, {
-  sex <- sample(c("M", "F"), size = 1,
-                prob = c(0.5, 0.5))
-  if (sex == "M") {
-    height <- rnorm(1, mean = 175, sd = 7)
-  }
-  if (sex == "F") {
-    height <- rnorm(1, mean = 160, sd = 7)
-  }
-  return(height)
-})
-
-
-## -----------------------------------------------------------------------------
-plot(density(height_vars), ylim = c(0, 0.06))
-# Add component densities
-x_seq <- seq(140, 200, length.out = 100)
-lines(x_seq, dnorm(x_seq, 175, 7), col = "red")
-lines(x_seq, dnorm(x_seq, 160, 7), col = "green")
-
-
-## -----------------------------------------------------------------------------
-# Sample with less code
-sex <- sample(c(1, 2), size = 1000,
-              replace = TRUE, 
-              prob = c(0.5, 0.5))
-height_vars <- rnorm(1000, c(175, 160)[sex], 7)
-c(mean(height_vars), sd(height_vars))
 
 
 ## ---- echo = FALSE------------------------------------------------------------
