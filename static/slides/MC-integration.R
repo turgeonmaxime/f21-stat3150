@@ -38,6 +38,15 @@ mean(exp(-unif_vars))
 
 ## -----------------------------------------------------------------------------
 n <- 1000
+unif_vars <- runif(n, min = 0, max = 0.5*pi)
+0.5*pi*mean(cos(unif_vars))
+
+# Compare to actual value
+sin(0.5*pi) - sin(0)
+
+
+## -----------------------------------------------------------------------------
+n <- 1000
 exp_vars <- rexp(n)
 mean(1/(1 + exp_vars))
 
@@ -58,6 +67,20 @@ c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
 exp_vars <- rexp(n)
 theta_hat <- mean(1/(1 + exp_vars))
 sigma_hat <- sd(1/(1 + exp_vars))
+
+c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
+  "Upper" = theta_hat + 1.96*sigma_hat/sqrt(n))
+
+
+## -----------------------------------------------------------------------------
+n <- 3150
+norm_vars <- rnorm(n)
+theta_hat <- mean(norm_vars^2)
+theta_hat
+
+
+## -----------------------------------------------------------------------------
+sigma_hat <- sd(norm_vars^2)
 
 c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
   "Upper" = theta_hat + 1.96*sigma_hat/sqrt(n))

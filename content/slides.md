@@ -16,6 +16,12 @@ If you are registered for the course, you can find the material on [UM Learn](ht
     + [`R` code](maximum-likelihood.R)
   - [Optimization](optimization.pdf)
     + [`R` code](optimization.R)
+  - [Generating Random Variates](generating-rvs.pdf)
+    + [`R` code](generating-rvs.R)
+  - [Monte Carlo Integration](MC-integration.pdf)
+    + [`R` code](MC-ingetration.R)
+
+
 <!--
   - [Course Overview](overview.pdf)
   - [Data Visualization](visualization.pdf)
