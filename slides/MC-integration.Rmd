@@ -96,12 +96,31 @@ follow this algorithm:
   2. Compute the sample mean $\overline{g(X)} = \frac{1}{n}\sum_{i=1}^ng(X_i)$.
   3. Estimate the integral via $(b-a)\overline{g(X)}$.
   
+## Exercise
+
+Use Monte-Carlo integration to estimate
+
+$$ \int_{0}^{\pi/2}\cos(x) dx.$$
+
+Compare the estimate with the theoretical value.
+
+## Solution 
+
+```{r}
+n <- 1000
+unif_vars <- runif(n, min = 0, max = 0.5*pi)
+0.5*pi*mean(cos(unif_vars))
+
+# Compare to actual value
+sin(0.5*pi) - sin(0)
+```
+  
 ## Slightly more complex example {.allowframebreaks}
 
   - Once we know that the LLN is working under the hood, we can expand our application beyond the uniform distribution.
   - Let $X$ be a continuous variable with density $f$. Then we know that
   $$E(g(X)) = \int_{-\infty}^\infty g(x)f(x)dx.$$
-  - Therefore, if we generate $X_1, \ldots, X_n$ independently from $f$, we can estimate $E(g(X))$ using   $$\overline{g(X)} = \frac{1}{n}g(X_i).$$
+  - Therefore, if we generate $X_1, \ldots, X_n$ independently from $f$, we can estimate $E(g(X))$ using $$\overline{g(X)} = \frac{1}{n}g(X_i).$$
   - We will apply these ideas to the following integral:
   $$\int_{0}^\infty \frac{e^{-x}}{1 + x}dx.$$
   - This integral is the product of a function $g(x) = \frac{1}{1 + x}$ and the density of an exponential $Exp(1)$. In other words:
@@ -146,6 +165,35 @@ c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
 exp_vars <- rexp(n)
 theta_hat <- mean(1/(1 + exp_vars))
 sigma_hat <- sd(1/(1 + exp_vars))
+
+c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
+  "Upper" = theta_hat + 1.96*sigma_hat/sqrt(n))
+```
+
+## Exercise
+
+Use Monte-Carlo integration to find an estimate of 
+
+$$\int_{-\infty}^\infty \frac{x^2}{\sqrt{2\pi}}\exp\left(-\frac{1}{2}x^2\right) dx.$$
+
+Compute a 95% confidence interval for your estimate
+
+## Solution {.allowframebreaks}
+
+  - First, we need to realize that we have
+  
+$$\int_{-\infty}^\infty \frac{x^2}{\sqrt{2\pi}}\exp\left(-\frac{1}{2}x^2\right) dx = E(X^2), \qquad X \sim N(0, 1).$$
+
+```{r}
+n <- 3150
+norm_vars <- rnorm(n)
+theta_hat <- mean(norm_vars^2)
+theta_hat
+```
+
+
+```{r}
+sigma_hat <- sd(norm_vars^2)
 
 c("Lower" = theta_hat - 1.96*sigma_hat/sqrt(n),
   "Upper" = theta_hat + 1.96*sigma_hat/sqrt(n))
@@ -199,7 +247,8 @@ plot(theta_hat,
 ## Example {.allowframebreaks}
 
   - Let's say we want to estimate the following integral:
-  $$\int_0^1 \frac{1}{x} dx.$$
+
+$$\int_0^1 \frac{1}{x} dx.$$
   - **Can you spot the problem?**
   
 ```{r}
@@ -273,7 +322,7 @@ unif_vars2 <- runif(n2, max = 2)
   - If $X$ and $Y$ are independent, their covariance is zero and the variance of the sample mean is 
   $$\frac{1}{4}\left(\mathrm{Var}(X) + \mathrm{Var}(Y)\right).$$
   - However, if $X$ and $Y$ are **negatively** correlated, we can actually achieve a **smaller** variance.
-    + For example, if $U\sim U(0,1)$, then $X=U$ and $Y= 1 - U$ are uniform on $(0,1)$, and they are negatively correlated: $\mathrm{Cov}(U, 1 - U) = -1/12$
+    + For example, if $U\sim U(0,1)$, then $X=U$ and $Y= 1 - U$ are uniform on $(0,1)$, and they are negatively correlated: $\mathrm{Cov}(U, 1 - U) = -1/12$ (check this!)
     
 ## Monotone functions
 
@@ -283,7 +332,6 @@ unif_vars2 <- runif(n2, max = 2)
     + We say $f$ is *increasing* if $f(x)\leq f(y)$ whenever $x\leq y$.
     + We say $f$ is *decreasing* if $f(x)\geq f(y)$ whenever $x\leq y$.
     + We say $f$ is *monotone* if $f$ is either increasing or decreasing.
-    
 
 ## Example {.allowframebreaks}
 
@@ -314,12 +362,19 @@ c(theta_hat, sigma_hat/sqrt(2*n))
 
   - In other words, we get the same standard error **with half the number of samples**.
   
-## Example {.allowframebreaks}
+## Exercise
 
-  - We will look at the exponential expectation again:
-  $$\int_{0}^\infty \frac{e^{-x}}{1 + x}dx.$$
+Use antithetic variables and Monte Carlo integration to find an estimate of 
+
+$$\int_{0}^\infty \frac{e^{-x}}{1 + x}dx.$$
+
+*Hint*: How can we generate exponential variates from uniform ones?
+
+## Solution {.allowframebreaks}
+
   - We know from the last module that if $U\sim U(0, 1)$, we also have 
-  $$-\log(U) \sim Exp(1),\qquad -\log(1 - U) \sim Exp(1).$$
+  
+$$-\log(U) \sim Exp(1),\qquad -\log(1 - U) \sim Exp(1).$$
   
 ```{r}
 # Classical approach
