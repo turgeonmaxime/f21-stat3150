@@ -120,7 +120,7 @@ sin(0.5*pi) - sin(0)
   - Once we know that the LLN is working under the hood, we can expand our application beyond the uniform distribution.
   - Let $X$ be a continuous variable with density $f$. Then we know that
   $$E(g(X)) = \int_{-\infty}^\infty g(x)f(x)dx.$$
-  - Therefore, if we generate $X_1, \ldots, X_n$ independently from $f$, we can estimate $E(g(X))$ using $$\overline{g(X)} = \frac{1}{n}g(X_i).$$
+  - Therefore, if we generate $X_1, \ldots, X_n$ independently from $f$, we can estimate $E(g(X))$ using $$\overline{g(X)} = \frac{1}{n}\sum_{i=1}^n g(X_i).$$
   - We will apply these ideas to the following integral:
   $$\int_{0}^\infty \frac{e^{-x}}{1 + x}dx.$$
   - This integral is the product of a function $g(x) = \frac{1}{1 + x}$ and the density of an exponential $Exp(1)$. In other words:
@@ -137,7 +137,7 @@ mean(1/(1 + exp_vars))
 
   - As we saw earlier, MC integration with $n=1000$ samples gave an estimate "close" to the true value.
     + Can we measure how close?
-  - Let $\hat{\theta} = \frac{1}{n}f(X_i)$ be our sample mean. 
+  - Let $\hat{\theta} = \frac{1}{n}\sum{i=1}^n f(X_i)$ be our sample mean. 
     + By the LLN, it converges to $\theta = E(f(X))$.
   - **Exercise**: If $\sigma^2$ is the variance of $f(X)$, check that the variance of $\hat{\theta}$ is equal to $\sigma^2/n$.
   - For a general function $f(x)$, we don't know the variance $\sigma^2$, so we need to estimate it:

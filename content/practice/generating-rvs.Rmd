@@ -62,3 +62,34 @@ $$ g(x, y) = \left(F^{-1}_1(\Phi(x)), F^{-1}_2(\Phi(y))\right).$$
   c. Using QQ-plots, check that after transformation, the first column follows an exponential distribution with $\lambda = 1$ and the second column follows an exponential distribution with $\lambda = 2$.
   d. Compute the correlation between the two columns. Is it close to $\rho = 0.5$?
   e. Repeat this simulation for different values of $\rho$. Create a scatter plot with $\rho$ on the $x$-axis and the correlation of the transformed variables on the $y$-axis. Do you see any relationship?
+  
+## Problem 7
+
+The density of the (standard) folded normal distribution is given by 
+$$f(x) = \frac{2}{\sqrt{2\pi}}\exp\left(-\frac{1}{2}x^2\right),\quad x > 0.$$
+
+  a. Implement the Accept-Reject algorithm to sample from the folded normal using proposals from the exponential distribution.
+  b. Once you have a sample from the folded normal distribution, you can transform them into a sample from the *standard normal* distribution by randomly selecting a sign (with equal probability). For example, if you sample 2.43 from a folded normal, you can transform it into either -2.43 or 2.43 by randomly choosing the sign. Using one of the methods discussed in class, show that this algorithm actually gives a random sample that matches the standard normal distribution.
+  c. Use the algorithm in b) to give an estimate of $Var(X)$ with a standard error approximately equal to 0.001.
+
+## Problem 8
+
+We will generate random variates from a standard normal $N(0, 1)$ using the double exponential distribution; its density is given by
+$$g(x\mid \lambda) = \frac{1}{2\lambda}\exp\left(-\frac{1}{\lambda}\lvert x\rvert\right), \quad \lambda > 0.$$
+
+  a. Let $f(x)$ be the density of the normal distribution. Compute the ratio $f(x)/g(x\mid \lambda)$. Using calculus (or any other analytic method), find a uniform upper bound $C$ for the ratio. (*Hint*: The upper bound $C$ will be a function of $\lambda$, but not of $x$.)
+  b. Find the value $\hat{\lambda}$ that minimizes the upper bound $C$.
+  c. Implement the Accept-Reject algorithm for sampling from $N(0,1)$ using proposals from $g(x\mid \hat{\lambda})$. To generate samples from a double exponential distribution, you can use the function `rdoublex` from the `smoothmest` package.
+  
+## Problem 9
+
+Suppose we want to sample from a density $f(x)$ which we only know up to a constant:
+
+$$ f(x) \propto \exp\left(-\frac{1}{3}\lvert x\rvert^3\right), \qquad x \in \mathbb{R}.$$
+
+In other words, we have $f(x) = M \exp\left(-\frac{1}{3}\lvert x\rvert^3\right)$ for an unknown constant $M > 0$.
+
+  a. Explain why we can still sample from this density using the Accept-Reject algorithm even if we don't know $M$.
+  b. Find a proposal density and implement the Accept-Reject algorithm to sample from $f$.
+  c. **Bonus** Explain how you could use this sample to estimate $M$.
+  
