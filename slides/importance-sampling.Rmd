@@ -5,7 +5,7 @@ source: true
 output: binb::metropolis
 fontsize: 12pt
 author: Max Turgeon
-institute: STAT 3150--Statistical Computing
+institute: STAT 3150---Statistical Computing
 header-includes:
   - \usefonttheme{professionalfonts}
   - \usepackage{graphicx}
@@ -75,8 +75,7 @@ n <- 5000
 integrand <- function(x) {
   # We want to multiply by zero if outside the range
   supp_ind <- as.numeric(x > 0 & x < 1)
-  
-  return(supp_ind*exp(-x)/(1 + x^2))
+  return(supp_ind * exp(-x)/(1 + x^2))
 }
 ```
 
@@ -96,7 +95,7 @@ sd1 <- sd(integrand(unif_vars))
 
 ```{r}
 # 2. Exponential density
-exp_vars <- rexp(n)
+exp_vars <- -log(unif_vars)
 
 theta2 <- mean(integrand(exp_vars)/dexp(exp_vars))
 sd2 <- sd(integrand(exp_vars)/dexp(exp_vars))
@@ -150,7 +149,36 @@ sd3 <- sd(integrand(truncexp_vars)/phi_vars)
 c(theta1, theta2, theta3)
 c(sd1, sd2, sd3)/sqrt(n)
 ```
+
+## Exercise
+
+Suppose that $f(x)$ is the density of a standard normal distribution, and that $g(x) = \exp\left(-\frac{1}{2}(x - 2)^2\right)$. Use important sampling to estimate $E_f(g(X))$ using 1) $phi(x)$ is the density of a standard normal; 2) $phi(x)$ is the density of $N(2,1)$.
+
+## Solution {.allowframebreaks}
+
+  - First, we sample from $N(0, 1)$, i.e. normal MC integration.
   
+```{r}
+n <- 3150
+integrand <- function(x) exp(-0.5*(x - 2)^2)
+norm_vars <- rnorm(n)
+theta1 <- mean(integrand(norm_vars))
+std_er1 <- sd(integrand(norm_vars))/sqrt(n)
+
+c(theta1, std_er1)
+```
+
+  - Next we sample from $N(2, 1)$. We can simply shift our previous sample.
+    
+```{r}
+norm_vars2 <- norm_vars + 2
+phi_vars <- dnorm(norm_vars2, mean = 2)
+theta2 <- mean(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)
+std_er2 <- sd(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)/sqrt(n)
+
+c(theta2, std_er2)
+```
+
 ## Variance comparison {.allowframebreaks}
 
   - In the example above, we looked at three different approaches:
@@ -187,7 +215,7 @@ legend(x = "topright",
 
 ## Example {.allowframebreaks}
 
-  - Suppose we want to estimate the tail probability of a standard normal variable $X\sim N(0, 1)$. Specifically, we want to estimate $P(X > 5)$.
+  - Suppose we want to estimate a tail probability of a standard normal variable $X\sim N(0, 1)$. Specifically, we want to estimate $P(X > 5)$.
   - We will explore a few different ways of estimating this quantity, trying to find the most efficient estimate.
   - First, we can use the "hit-or-miss" approach, i.e. sample from a standard normal and count the proportion of samples that are greater than 5.
   
@@ -207,7 +235,7 @@ norm_vars <- rnorm(n)
 mean(norm_vars > 5)
 ```
 
-  - So we had 3 out of 10 million samples! But we can use the symmetry of the standard normal to do slightly better.
+  - So we had `r sum(norm_vars > 5)` out of 10 million samples! But we can use the symmetry of the standard normal to do slightly better.
   
 ```{r}
 # Check if > 5 in absolute value, and divide by 2
@@ -247,7 +275,9 @@ c("Method1" = sd(norm_vars > 5),
 
   - This corresponds to a variance reduction of `r round(0.5*sd(abs(norm_vars) > 5)/sd_est)` times!
   - In other words, with Method 3, we can achieve the same precision as Method 2 by using `r round(sqrt(0.5*sd(abs(norm_vars) > 5)/sd_est))` times less samples.
-  
+
+<!--
+
 ## Self-Normalized Importance Sampling {.allowframebreaks}
 
   - Recall our setting: we want to estimate
@@ -319,7 +349,8 @@ To estimate $\theta = \int_A g(x) f(x) dx$:
   
 ```{r}
 pi_seq <- ppoints(100)
-posterior <- 1*choose(294, 32)*pi_seq^32*(1 - pi_seq)^262
+posterior <- 1*choose(294, 32)*pi_seq^32*
+  (1 - pi_seq)^262
 
 plot(pi_seq, posterior, type = "l")
 ```
@@ -376,19 +407,4 @@ gvals <- as.numeric(beta_vars > 0.08 &
 numerator <- weight(beta_vars)*gvals
 mean(numerator)/mean(denominator)
 ```
-
-<!-- |           | Yes | No  | Total | -->
-<!-- |-----------|-----|-----|-------| -->
-<!-- | East wing | 28  | 129 | 157   | -->
-<!-- | West wing | 4   | 133 | 137   | -->
-<!-- | Total     | 32  | 262 | 294   | -->
-
-<!--   - Let $p_E,p_W$ be the probability of developing tuberculosis while living in the East wing and West wing, respectively. -->
-<!--   - We are interested in the ratio $\theta = p_E/p_W$, which measures the relative risk of living in each wings. -->
-<!--   - In frequentist statistics, we first start with the *likelihood* function: -->
-<!--     + The likelihood function is the probability of our data given our model. -->
-<!--   - Our model for the data is the binomial models $Binom(157, p_E)$ and $Binom(137, p_W)$.  -->
-<!--   - Assuming the observations are independent, our likelihood function is -->
-<!--   \begin{align*}p(X\mid p_E, p_W) &= \left[{157\choose 28}p_E^{28}(1-p_E)^{129}\right] \times\\ -->
-<!--     &\qquad \left[{137\choose 4}p_W^{4}(1-p_W)^{133}\right]. -->
-<!--   \end{align*} -->
+-->

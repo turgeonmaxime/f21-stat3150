@@ -24,8 +24,7 @@ n <- 5000
 integrand <- function(x) {
   # We want to multiply by zero if outside the range
   supp_ind <- as.numeric(x > 0 & x < 1)
-  
-  return(supp_ind*exp(-x)/(1 + x^2))
+  return(supp_ind * exp(-x)/(1 + x^2))
 }
 
 
@@ -45,7 +44,7 @@ sd1 <- sd(integrand(unif_vars))
 
 ## -----------------------------------------------------------------------------
 # 2. Exponential density
-exp_vars <- rexp(n)
+exp_vars <- -log(unif_vars)
 
 theta2 <- mean(integrand(exp_vars)/dexp(exp_vars))
 sd2 <- sd(integrand(exp_vars)/dexp(exp_vars))
@@ -78,6 +77,25 @@ sd3 <- sd(integrand(truncexp_vars)/phi_vars)
 # Compare results
 c(theta1, theta2, theta3)
 c(sd1, sd2, sd3)/sqrt(n)
+
+
+## -----------------------------------------------------------------------------
+n <- 3150
+integrand <- function(x) exp(-0.5*(x - 2)^2)
+norm_vars <- rnorm(n)
+theta1 <- mean(integrand(norm_vars))
+std_er1 <- sd(integrand(norm_vars))/sqrt(n)
+
+c(theta1, std_er1)
+
+
+## -----------------------------------------------------------------------------
+norm_vars2 <- norm_vars + 2
+phi_vars <- dnorm(norm_vars2, mean = 2)
+theta2 <- mean(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)
+std_er2 <- sd(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)/sqrt(n)
+
+c(theta2, std_er2)
 
 
 ## -----------------------------------------------------------------------------
@@ -136,7 +154,8 @@ c("Method1" = sd(norm_vars > 5),
 
 ## -----------------------------------------------------------------------------
 pi_seq <- ppoints(100)
-posterior <- 1*choose(294, 32)*pi_seq^32*(1 - pi_seq)^262
+posterior <- 1*choose(294, 32)*pi_seq^32*
+  (1 - pi_seq)^262
 
 plot(pi_seq, posterior, type = "l")
 
