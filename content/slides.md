@@ -20,6 +20,8 @@ If you are registered for the course, you can find the material on [UM Learn](ht
     + [`R` code](generating-rvs.R)
   - [Monte Carlo Integration](MC-integration.pdf)
     + [`R` code](MC-ingetration.R)
+  - [Importance Sampling](importance-sampling.pdf)
+    + [`R` code](importance-sampling.R)
 
 
 <!--
