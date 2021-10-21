@@ -92,10 +92,20 @@ c(theta1, std_er1)
 ## -----------------------------------------------------------------------------
 norm_vars2 <- norm_vars + 2
 phi_vars <- dnorm(norm_vars2, mean = 2)
-theta2 <- mean(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)
-std_er2 <- sd(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)/sqrt(n)
+num_vars <- integrand(norm_vars2)*dnorm(norm_vars2)
+
+theta2 <- mean(num_vars/phi_vars)
+std_er2 <- sd(num_vars/phi_vars)/sqrt(n)
 
 c(theta2, std_er2)
+
+
+## ----eval = TRUE, echo = FALSE------------------------------------------------
+integrand <- function(x) {
+  # We want to multiply by zero if outside the range
+  supp_ind <- as.numeric(x > 0 & x < 1)
+  return(supp_ind * exp(-x)/(1 + x^2))
+}
 
 
 ## -----------------------------------------------------------------------------
@@ -130,9 +140,8 @@ c(sd(norm_vars > 5), 0.5*sd(abs(norm_vars) > 5))
 
 
 ## -----------------------------------------------------------------------------
-# Shifted exponential density
-unif_vars <- runif(n)
-shiftexp_vars <- -log(unif_vars) + 5
+# Shifted exponential variates
+shiftexp_vars <- rexp(n) + 5
 
 # Evaluate the density at those points
 phi_vars <- exp(-(shiftexp_vars - 5))
@@ -152,12 +161,12 @@ c("Method1" = sd(norm_vars > 5),
   "Method 3" = sd_est)
 
 
-## -----------------------------------------------------------------------------
-pi_seq <- ppoints(100)
-posterior <- 1*choose(294, 32)*pi_seq^32*
-  (1 - pi_seq)^262
-
-plot(pi_seq, posterior, type = "l")
+## ----eval = FALSE, echo = FALSE-----------------------------------------------
+## pi_seq <- ppoints(100)
+## posterior <- 1*choose(294, 32)*pi_seq^32*
+##   (1 - pi_seq)^262
+## 
+## plot(pi_seq, posterior, type = "l")
 
 
 ## ---- eval = FALSE, echo = FALSE----------------------------------------------
@@ -166,45 +175,45 @@ plot(pi_seq, posterior, type = "l")
 ##      type = "l")
 
 
-## -----------------------------------------------------------------------------
-# Create a function for posterior and weight
-post_fun <- function(pi) {
-  1*choose(294, 32)*pi^32*(1 - pi)^262
-}
-
-weight <- function(pi) {
-  post_fun(pi)/dbeta(pi, shape1 = 2, 
-                     shape2 = 10)
-}
-
-
-## -----------------------------------------------------------------------------
-# Assume we are interested in posterior mean
-# so g(x) = x
-n <- 5000
-beta_vars <- rbeta(n, shape1 = 2, shape2 = 10)
-
-denominator <- weight(beta_vars)
-numerator <- weight(beta_vars)*beta_vars
-(theta <- mean(numerator)/mean(denominator))
+## ----eval = FALSE, echo = FALSE-----------------------------------------------
+## # Create a function for posterior and weight
+## post_fun <- function(pi) {
+##   1*choose(294, 32)*pi^32*(1 - pi)^262
+## }
+## 
+## weight <- function(pi) {
+##   post_fun(pi)/dbeta(pi, shape1 = 2,
+##                      shape2 = 10)
+## }
 
 
-## -----------------------------------------------------------------------------
-# What about posterior variance?
-denominator <- weight(beta_vars)
-numerator <- weight(beta_vars)*beta_vars^2 # g(x) = x^2
-theta2 <- mean(numerator)/mean(denominator)
-# Var(X) = E(X^2) - E(X)^2
-theta2 - theta^2
+## ----eval = FALSE, echo = FALSE-----------------------------------------------
+## # Assume we are interested in posterior mean
+## # so g(x) = x
+## n <- 5000
+## beta_vars <- rbeta(n, shape1 = 2, shape2 = 10)
+## 
+## denominator <- weight(beta_vars)
+## numerator <- weight(beta_vars)*beta_vars
+## (theta <- mean(numerator)/mean(denominator))
 
 
-## -----------------------------------------------------------------------------
-# What about posterior probability that pi
-# is between 0.08 and 0.12?
-denominator <- weight(beta_vars)
-# g(x) is indicator function
-gvals <- as.numeric(beta_vars > 0.08 &
-                      beta_vars < 0.12)
-numerator <- weight(beta_vars)*gvals
-mean(numerator)/mean(denominator)
+## ----eval = FALSE, echo = FALSE-----------------------------------------------
+## # What about posterior variance?
+## denominator <- weight(beta_vars)
+## numerator <- weight(beta_vars)*beta_vars^2 # g(x) = x^2
+## theta2 <- mean(numerator)/mean(denominator)
+## # Var(X) = E(X^2) - E(X)^2
+## theta2 - theta^2
+
+
+## ----eval = FALSE, echo = FALSE-----------------------------------------------
+## # What about posterior probability that pi
+## # is between 0.08 and 0.12?
+## denominator <- weight(beta_vars)
+## # g(x) is indicator function
+## gvals <- as.numeric(beta_vars > 0.08 &
+##                       beta_vars < 0.12)
+## numerator <- weight(beta_vars)*gvals
+## mean(numerator)/mean(denominator)
 

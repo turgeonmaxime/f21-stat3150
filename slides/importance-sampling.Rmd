@@ -152,7 +152,10 @@ c(sd1, sd2, sd3)/sqrt(n)
 
 ## Exercise
 
-Suppose that $f(x)$ is the density of a standard normal distribution, and that $g(x) = \exp\left(-\frac{1}{2}(x - 2)^2\right)$. Use important sampling to estimate $E_f(g(X))$ using 1) $phi(x)$ is the density of a standard normal; 2) $phi(x)$ is the density of $N(2,1)$.
+Suppose that $f(x)$ is the density of a standard normal distribution, and that $g(x) = \exp\left(-\frac{1}{2}(x - 2)^2\right)$. Use important sampling to estimate $E_f(g(X))$ using:
+
+  1. $\phi(x)$ is the density of a standard normal; 
+  2. $\phi(x)$ is the density of $N(2,1)$.
 
 ## Solution {.allowframebreaks}
 
@@ -173,8 +176,10 @@ c(theta1, std_er1)
 ```{r}
 norm_vars2 <- norm_vars + 2
 phi_vars <- dnorm(norm_vars2, mean = 2)
-theta2 <- mean(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)
-std_er2 <- sd(integrand(norm_vars2)*dnorm(norm_vars2)/phi_vars)/sqrt(n)
+num_vars <- integrand(norm_vars2)*dnorm(norm_vars2)
+
+theta2 <- mean(num_vars/phi_vars)
+std_er2 <- sd(num_vars/phi_vars)/sqrt(n)
 
 c(theta2, std_er2)
 ```
@@ -202,6 +207,15 @@ $$\phi^*(x) = \frac{\lvert g(x) \rvert f(x)}{\int_A \lvert g(t) \rvert f(t) dt}.
 
   - We can check by plotting the ratio $\frac{\lvert g(x) \rvert f(x)}{\phi(x)}$.
     + We want it to be *almost constant*, i.e. close to horizontal.
+
+```{r eval = TRUE, echo = FALSE}
+integrand <- function(x) {
+  # We want to multiply by zero if outside the range
+  supp_ind <- as.numeric(x > 0 & x < 1)
+  return(supp_ind * exp(-x)/(1 + x^2))
+}
+```
+
 
 ```{r}
 # Points between 0 and 1 without boundary
@@ -251,9 +265,8 @@ c(sd(norm_vars > 5), 0.5*sd(abs(norm_vars) > 5))
   - **Exercise**: the density is given by $\phi(x) = \exp(-x + 5)$
   
 ```{r}
-# Shifted exponential density
-unif_vars <- runif(n)
-shiftexp_vars <- -log(unif_vars) + 5
+# Shifted exponential variates
+shiftexp_vars <- rexp(n) + 5
 
 # Evaluate the density at those points
 phi_vars <- exp(-(shiftexp_vars - 5))
@@ -346,8 +359,10 @@ To estimate $\theta = \int_A g(x) f(x) dx$:
   - One way to encode this is by using a uniform prior distribution (i.e. all value of $\pi$ are equally likely).
     + $p(\pi) = 1.$
   - Let's plot the product $p(\pi)p(X\mid\pi)$ to see what it looks like for different values of $\pi$.
-  
-```{r}
+
+-->  
+
+```{r eval = FALSE, echo = FALSE}
 pi_seq <- ppoints(100)
 posterior <- 1*choose(294, 32)*pi_seq^32*
   (1 - pi_seq)^262
@@ -355,9 +370,11 @@ posterior <- 1*choose(294, 32)*pi_seq^32*
 plot(pi_seq, posterior, type = "l")
 ```
 
+<!--
   - As we can see, the posterior is supported on $(0,1)$ with a peak around $\pi = 0.1$.
   - Recall that the beta distribution $\mathrm{Beta}(\alpha, \beta)$ is supported on $(0, 1)$ with a peak at $\frac{\alpha - 1}{\alpha+\beta+2}$.
   - This suggests using $\mathrm{Beta}(2, 10)$ for the density $\phi$.
+-->
   
 ```{r, eval = FALSE, echo = FALSE}
 # Let's look at the ratio
@@ -365,7 +382,7 @@ plot(pi_seq, posterior/dbeta(pi_seq, 2, 10),
      type = "l")
 ```
 
-```{r}
+```{r eval = FALSE, echo = FALSE}
 # Create a function for posterior and weight
 post_fun <- function(pi) {
   1*choose(294, 32)*pi^32*(1 - pi)^262
@@ -377,7 +394,7 @@ weight <- function(pi) {
 }
 ```
 
-```{r}
+```{r eval = FALSE, echo = FALSE}
 # Assume we are interested in posterior mean
 # so g(x) = x
 n <- 5000
@@ -388,7 +405,7 @@ numerator <- weight(beta_vars)*beta_vars
 (theta <- mean(numerator)/mean(denominator))
 ```
 
-```{r}
+```{r eval = FALSE, echo = FALSE}
 # What about posterior variance?
 denominator <- weight(beta_vars)
 numerator <- weight(beta_vars)*beta_vars^2 # g(x) = x^2
@@ -397,7 +414,7 @@ theta2 <- mean(numerator)/mean(denominator)
 theta2 - theta^2
 ```
 
-```{r}
+```{r eval = FALSE, echo = FALSE}
 # What about posterior probability that pi
 # is between 0.08 and 0.12?
 denominator <- weight(beta_vars)
@@ -407,4 +424,21 @@ gvals <- as.numeric(beta_vars > 0.08 &
 numerator <- weight(beta_vars)*gvals
 mean(numerator)/mean(denominator)
 ```
--->
+
+## Where to go from here?
+
+  - As you can probably see, the hardest part is finding the right density $\phi$.
+  - There's been a lot of research on better strategies.
+    + Adaptive IS: Start with trial density $\phi$, and update as you get more information about $g(x)f(x)$.
+    + Sequential IS: For high-dimensional problems, build from conditional densities sequentially.
+    + Annealed IS: Construct the density $\phi$ using Markov chains.
+  - There's also been a lot of research on how to adapt importance sampling to more complex distributions.
+  
+## Some applications
+
+  - Bouchard-Côté *et al* (2012) generalized sequential IS so that they could use it to make probability statements about phylogenetic trees.
+    + Need distribution on phylogenetic trees
+  - Glynn & Iglehart (1989) discuss how importance sampling can be used to study queuing theory and estimate average waiting times (for example).
+    + Queuing theory relies on stochastic processes
+  - Lyman & Zuckerman (2007) use annealed IS to estimate the average equilibrium state of peptides as they cool down.
+    + Need distribution on cooling paths
