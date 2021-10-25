@@ -36,15 +36,15 @@ set.seed(3150)
 ## Lecture Objectives
 
   - Recall the definition of a statistic and its sampling distribution
-  - Learn how simulations can be used for estimation
-  - Learn how simulations can be used for hypothesis testing
+  - Explain how simulations can be used for estimation and hypothesis testing
+  - Design and conduct a simulation study
 
 ## Motivation
 
-  - Over the last few weeks, we talked about generating random variables and use this to estimate integrals.
-  - This week, we will investigate how these ideas can be used for data analysis.
+  - Over the last few weeks, we talked about generating random variables and used them to estimate integrals.
+  - Starting this week, we will investigate how these ideas can be used for data analysis.
     + How to use simulations to estimate population parameters.
-    + How to use simulations to perform hypothesis testing. (See interactive tutorial)
+    + How to use simulations to perform hypothesis testing.
     
 ## Definitions {.allowframebreaks}
 
@@ -96,6 +96,61 @@ gvars <- abs(norm_vars1 - norm_vars2)
 mean(gvars)
 sd(gvars)/sqrt(B)
 ```
+
+## Exercise 
+
+Using Monte Carlo simulations, find the average Euclidean distance between two points uniformly and independently drawn from the unit square, i.e. both the x and the y coordinates for a single point are drawn from $U(0, 1)$.
+
+To help you find the solution, try to answer the following questions:
+
+  - What constitutes a sample? (Is it one point? Two points?)
+  - What is the statistic?
+
+## Solution {.allowframebreaks}
+
+  - Recall: if we have two points $(x_1, y_1)$ and $(x_2, y_2)$, their Euclidean distance is
+  
+$$ dist = \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}.$$
+
+  - The answer to the questions:
+    + A sample is a *pair* of points.
+    + The statistic is the Euclidean distance between the two points in the sample.
+  - The idea is therefore to generate multiple pairs of points and compute their Euclidean distance. We get an estimate of the average distance by taking the sample mean.
+
+```{r}
+B <- 5000
+
+# Using replicate, or a for loop
+dist_vec <- replicate(B, {
+    point1 <- runif(2)
+    point2 <- runif(2)
+    dist <- sqrt(sum((point1 - point2)^2))
+    return(dist)
+})
+
+mean(dist_vec)
+```
+
+  - If we look at a histogram of the sampling distribution, we can see that it doesn't look like a normal distribution.
+  
+```{r}
+hist(dist_vec, breaks = 50)
+```
+
+  - However, by the Central Limit Theorem, the sample mean of the distances approximately follows a normal distribution. 
+  - We can use this result to construct a 95% confidence interval around our estimate.
+  
+```{r}
+theta <- mean(dist_vec)
+se_dist <- sd(dist_vec)/sqrt(B)
+
+c(theta - 1.96*se_dist,
+  theta + 1.96*se_dist)
+```
+
+  - **Be careful**: There are two sampling distributions here, and you should be able to distinguish between them.
+    + The sampling distribution of the distances (doesn't depend on the sample size).
+    + The sampling distribution of the *sample mean* of the distances (does depend on the sample size).
 
 ## Mean squared error {.allowframebreaks}
 
@@ -164,7 +219,11 @@ rowMeans((results - 0)^2)
   $$X\sim p N(0,1) + (1-p)N(0, 100).$$
   - In other words, $X$ follows a mixture distribution.
     + The second component, $N(0, 100)$, is responsible for the outliers in the sample.
-    
+  - We can generate from a mixture distribution as follows:
+    + Generate from a Bernoulli distribution with probability $p$.
+    + If $Y = 0$, generate from the first component $N(0, 1)$.
+    + If $Y = 1$, generate from the second component $N(0, 100)$.
+  
 ```{r}
 p <- 0.9
 n <- 20; B <- 2209
@@ -186,6 +245,65 @@ rowMeans(results) - 0
 rowMeans((results - 0)^2)
 ```
 
-  - As we can see, the trimmed mean has lower bias.
-  - It also has a lower MSE than the sample mean.
+  - As we can see, the two types of means have similar bias.
+  - But the trimmed mean has a lower MSE than the sample mean.
+    + And therefore it has lower variance.
   - **Conclusion**: With finite samples, we can sometimes find more efficient estimates of the mean.
+  
+## Hypothesis testing {.allowframebreaks}
+
+  - In hypothesis testing, we start with a **null hypothesis** about our parameter $\theta$:
+  $$H_0: \theta = \theta_0.$$
+  - We then use a **test statistic** to determine whether we should reject or not the null hypothesis.
+    + A test statistic can also be an estimator, but more often it's a transformation thereof.
+  - If we know the sampling distribution of our test statistic when $H_0$ holds (i.e. $\theta = \theta_0$), then we can compute *how likely* it is to observe some given values of a test statistic.
+  - This gives rise to the notion of a **p-value**: if your test statistic is $T$, and the observed value (i.e. after you've plugged in your data) is $t$, then the p-value is the following conditional probability:
+  $$P(T > t \mid H_0\mbox{ hold}).$$
+  - Finally, we can reject the null hypothesis if the p-value is smaller than a predetermined level of significance $\alpha$.
+  - With hypothesis testing, we can make two types of error:
+    + **Type I error**: Rejecting the null hypothesis when it holds. This is typically controlled by our decision rule (i.e. when we call a p-value significant).
+    + **Type II error**: Not rejecting the null hypothesis when it doesn't hold. All things being equal, we would prefer a test with a smaller Type II error rate.
+  - **Power** is 1 minus the Type II error rate. By minimizing the latter, we increase power. All things being equal, we would prefer a test with higher power.
+    + Note: Power typically increases with the sample size. The larger the sample size, the more likely we will reject the null hypothesis.
+
+## Example {.allowframebreaks}
+
+  - We can use simulations to estimate the type I error rate.
+  - Here's the general idea:
+    + Simulate data assuming the null hypothesis holds.
+    + Perform a hypothesis test on the simulated data.
+    + Count the proportion of our simulations that lead to a rejection of the null hypothesis.
+  - Note: To estimate power, simulate data when the null hypothesis doesn't hold.
+  - Consider two normal distributions $N(\mu_1, \sigma^2_1)$ and $N(\mu_2, \sigma^2_2)$, and assume that the null hypothesis is $H_0: \mu_1 = \mu_2$. 
+  - We can generate from these two distributions by using the same mean, and use a t-test to decide whether we reject $H_0$ or not. 
+    + This can be done by comparing our p-value to our significance level $\alpha$. 
+  - Our estimate of the type I error rate would be the proportion of simulated datasets that led to a rejected t-test.
+
+```{r}
+# Number of simulations
+B <- 1000
+# Sample size for data
+n <- 20
+# Same mean
+mu1 <- mu2 <- 0
+# Same variance; could also be different
+sigma1 <- sigma2 <- 1
+```
+
+
+```{r}
+results <- replicate(B, {
+  # Generate two samples
+  norm_vars1 <- rnorm(n, mu1, sigma1)
+  norm_vars2 <- rnorm(n, mu2, sigma2)
+  # Perform t-test
+  output <- t.test(norm_vars1, norm_vars2)
+  # alpha = 0.05
+  return(output$p.value < 0.05)
+})
+
+table(results)/B
+```
+
+  - Our estimate of the Type I error rate is close to our significance level $\alpha = 0.05$. 
+  - **Question**: To increase the accuracy, should we increase `B` or `n`?

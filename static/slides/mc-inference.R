@@ -28,6 +28,32 @@ sd(gvars)/sqrt(B)
 
 
 ## -----------------------------------------------------------------------------
+B <- 5000
+
+# Using replicate, or a for loop
+dist_vec <- replicate(B, {
+    point1 <- runif(2)
+    point2 <- runif(2)
+    dist <- sqrt(sum((point1 - point2)^2))
+    return(dist)
+})
+
+mean(dist_vec)
+
+
+## -----------------------------------------------------------------------------
+hist(dist_vec, breaks = 50)
+
+
+## -----------------------------------------------------------------------------
+theta <- mean(dist_vec)
+se_dist <- sd(dist_vec)/sqrt(B)
+
+c(theta - 1.96*se_dist,
+  theta + 1.96*se_dist)
+
+
+## -----------------------------------------------------------------------------
 mean(c(1,5,2,8, 4))
 mean(c(1,5,2,8, 100))
 
@@ -81,4 +107,29 @@ results <- replicate(B, {
 rowMeans(results) - 0
 # MSE
 rowMeans((results - 0)^2)
+
+
+## -----------------------------------------------------------------------------
+# Number of simulations
+B <- 1000
+# Sample size for data
+n <- 20
+# Same mean
+mu1 <- mu2 <- 0
+# Same variance; could also be different
+sigma1 <- sigma2 <- 1
+
+
+## -----------------------------------------------------------------------------
+results <- replicate(B, {
+  # Generate two samples
+  norm_vars1 <- rnorm(n, mu1, sigma1)
+  norm_vars2 <- rnorm(n, mu2, sigma2)
+  # Perform t-test
+  output <- t.test(norm_vars1, norm_vars2)
+  # alpha = 0.05
+  return(output$p.value < 0.05)
+})
+
+table(results)/B
 
