@@ -1,0 +1,71 @@
+---
+title: "Practice problems--MC Integration and Importance Sampling"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+Estimate the following integral:
+
+$$\int_0^\infty x^{3/2}e^{-x}dx.$$
+
+  a) Using classical Monte Carlo integration.
+  b) Using importance sampling with $\phi(x)$ the density of a chi-square distribution on 1 degree of freedom.
+  c) Using importance sampling with $\phi(x)$ the density of a chi-square distribution on 5 degrees of freedom.
+  
+## Problem 2
+
+Estimate the following integral:
+
+$$\int_0^\pi \frac{dx}{x^2 + \cos^2x}.$$
+
+  a) Using classical Monte Carlo integration.
+  b) Using importance sampling with $\phi(x)$ the density of an exponential distribution with mean 1.
+  c) **Bonus**: Consider a general exponential distribution with mean $1/\lambda$ for the importance function $\phi$. For which value of $\lambda$ can you minimize the variance of the estimate?
+  
+## Problem 3
+
+We will look at an application of Monte Carlo integration to financial statistics. Let $V_0$ be the original value of a portfolio, and let $V_1$ be its value after one unit of time (e.g. a day, a week, a month). Define the **loss** as follows:
+$$L = -(V_1 - V_0).$$
+In other words, if the value of the portfolio decreased, $L$ will be a positive number representing the value lost.
+
+We are interested in estimating the **Value-at-Risk**, which is defined as the real number $x$ such that
+$$P(L > x) = p,$$
+for a probability $p$ (e.g. $p = 0.01$). In other words, the probability of losing value of $x$ or more is equal to $p$.
+
+For simplicity, we will assume that $V_0$ is fixed and $V_1\sim N(V_0, \sigma^2)$.
+
+  a) Derive the distribution of $L$.
+  b) Fix $V_0=1000$ and $\sigma = 100$ for the rest of this problem. Using the hit-or-miss approach, give an estimate of $P(L > 0)$, i.e. the probability that the loss is positive. Choose a sample size such that the length of an approximate 95% confidence interval is about 0.04.
+  c) Now fix $p=0.05$. Find an estimate of the Value-at-Risk $x$. (**Hint**: You will probably have to use the hit-or-miss approach multiple times.)
+  d) Repeat parts b) and c) using Importance Sampling. Be explicit about your choice of importance function(s).
+  
+## Problem 4
+
+Suppose we want to estimate the expected value
+$$ E(\exp(-0.5(X - 10)^2)),$$
+where $X$ is a standard normal, using importance sampling. You can choose between three different normal distributions (same variance, different mean) for the importance function $\phi(x)$:
+
+  - $N(0, 1)$
+  - $N(5, 1)$
+  - $N(10, 1)$
+  
+  a) Using a graphical approach, explain which candidate should lead to the smallest variance.
+  b) Confirm your guess by computing estimates using all three importance functions and providing standard error estimates.
+  
+## Problem 5
+
+Consider the following density function:
+$$f(x) = \frac{2}{\pi(x^2 + 4)},$$
+where $x$ is any real number. You can sample from this distribution using the inverse-transform method.
+
+Consider the following integral:
+$$\theta = \int_{-\infty}^\infty \frac{\cos(3x)}{x^2 + 4}dx.$$
+
+  a) By sampling from the distribution above, use Monte Carlo integration to compute an estimate of $\theta$.
+  b) Compute an estimate of the same integral using Importance Sampling and the Cauchy distribution.
+  c) Find another importance function and compute a third estimate of $\theta$.
