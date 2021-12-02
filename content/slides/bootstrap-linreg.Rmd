@@ -1,11 +1,11 @@
 ---
-title: "Resampling Applications"
+title: "Bootstrap and Linear regression"
 draft: false
 source: true
 output: binb::metropolis
 fontsize: 12pt
 author: Max Turgeon
-institute: STAT 3150--Statistical Computing
+institute: STAT 3150---Statistical Computing
 header-includes:
   - \usefonttheme{professionalfonts}
   - \usepackage{graphicx}
@@ -34,153 +34,18 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 ## Lecture Objectives
 
-  - Review multiple linear regression and residual analysis.
-  - Recognize the relative importance of regression assumptions.
   - Understand the difference between resampling cases vs residuals.
 
 ## Motivation
 
-  - In the last module, we discussed how bootstrap can be used to approximate the sampling distribution.
-    + The general idea is based on replacing the true CDF by the empirical CDF (i.e. sampling with replacement).
-  - If we make assumptions about the data-generating mechanism, we can sometimes improve on the general bootstrap.
-  - We will explore this idea using **linear regression**.
-
-## Recall: Linear model
-
-  - $Y$ is an outcome variable, $X_1, \ldots, X_p$ are covariates.
-  $$ Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p + \epsilon.$$
-  - Here, $\epsilon$ is a random variable with mean 0 and variance $\sigma^2$, so we can also write
-  $$ E(Y \mid X_1, \ldots, X_p) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p.$$
-  - In matrix notation, we have
-  $$E(Y, \mid \mathbf{X}) = \beta^T\mathbf{X},$$
-  where
-\begin{align*}
-\beta &= (\beta_0, \beta_1, \ldots, \beta_p),\\
-\mathbf{X} &= (1, X_1, \ldots, X_p).
-\end{align*}
-  
-## Least-Squares Estimation
-
-  - Let $Y_1,\ldots,Y_n$ be a random sample of size $n$, and let $\mathbf{X}_1, \ldots, \mathbf{X}_n$ be the corresponding sample of covariates.
-  - We will write $\mathbb{Y}$ for the vector whose $i$-th element is $Y_i$, and $\mathbb{X}$ for the matrix whose $i$-th row is $\mathbf{X}_i$.
-  - The Least-Squares estimate $\hat{\beta}$ is given by
-  $$\hat{\beta} = (\mathbb{X}^T\mathbb{X})^{-1}\mathbb{X}^T\mathbb{Y}.$$
-  
-## Assumptions
-
-Gelman, Hill and Vehtari (2020) list the assumptions of linear regression **in decreasing order of importance**:
-
-  1. Validity (with respect to the research question).
-  2. Representativeness (of the data with respect to the population).
-  3. Additivity and linearity.
-  4. Independence of \textcolor{blue}{errors}.
-  5. Equal variance of \textcolor{blue}{errors}.
-  6. Normality of \textcolor{blue}{errors}.
-  
-## Additivity and linearity
-
-  - Main mathematical assumption:
-  $$ E(Y \mid X_1, \ldots, X_p) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p.$$
-  - Or in English:
-    + Changes in the conditional mean of $Y$ should be additive and linear.
-  - **Note**: Conditional mean = on average
-    + Life is probably nonlinear and non-additive...
-    + But it can still be a good approximation of the average
-
-## Diagnostic plots
-
-  1. For **simple** linear regression (i.e. only one covariate), plot outcome against covariate.
-  2. Plot outcome against fitted values.
-  3. Plot residuals against fitted values and/or covariates.
-
-**Note**: It is not recommended to plot outcome against residuals.
-
-## First example {.allowframebreaks}
-
-  - Data contains 53 observations of iron measurements, obtained via two methods: `chemical` and `magnetic`.
-  
-```{r}
-library(DAAG)
-library(ggplot2)
-
-# Fit model
-fit1 <- lm(magnetic ~ chemical, data=ironslag)
-coef(fit1)
-```
-
-```{r}
-# Plot fitted linear trend
-ggplot(ironslag, aes(chemical, magnetic)) +
-  geom_point() + 
-  geom_abline(intercept = coef(fit1)[1],
-              slope = coef(fit1)[2])
-```
-
-```{r}
-# Fitted against residuals
-plot(fitted(fit1), resid(fit1)) 
-abline(h = 0)
-```
-
-```{r}
-# Histogram of student residuals
-hist(rstudent(fit1), 20)
-```
-
-```{r}
-# Histogram of Cook's distance
-hist(cooks.distance(fit1), 20)
-```
-
-  - The residual plot shows evidence of heteroscedasticity.
-    + **Conclusion**: Some assumptions of the linear model are likely violated.
-  - There is also evidence of potential outliers and influential observations.
-  
-## Second example {.allowframebreaks}
-
-  - Data contains body and brain size measurements for 62 mammals.
-  - We will fit a linear model of the *log* brain size vs the *log* body size
-
-```{r}
-library(MASS)
-library(ggplot2)
-
-# Fit model
-fit2 <- lm(log(brain) ~ log(body), data = mammals)
-coef(fit2)
-```
-
-```{r}
-# Plot fitted linear trend
-ggplot(mammals, aes(log(body), log(brain))) +
-  geom_point() + 
-  geom_abline(intercept = coef(fit2)[1],
-              slope = coef(fit2)[2])
-```
-
-```{r}
-# Fitted against residuals
-plot(fitted(fit2), resid(fit2)) 
-abline(h = 0)
-```
-
-```{r}
-# Histogram of student residuals
-hist(rstudent(fit2), 20)
-```
-
-```{r}
-# Histogram of Cook's distance
-hist(cooks.distance(fit2), 20)
-```
-
-  - The residual plot *does not* show evidence of heteroscedasticity or any model violation.
-    + **Conclusion**: The assumptions of the linear model likely hold.
-  - There is some evidence of potential outliers and influential observations.
+  - In the last two modules, we reviewed linear regression and discussed residual analysis.
+    + We discussed the linear regression assumptions, and their relative importance.
+  - In this module, we will discuss how to use bootstrap in the context of linear regression.
+  - There are actually 2 different ways of using bootstrap, corresponding to 2 different sets of assumptions concerning the data generating mechanism.
 
 ## Bootstrap and Linear regression {.allowframebreaks}
 
-  - When the error term is normally distributed, we know the distribution of $\hat{\beta}$:
+  - When the error term is normally distributed, we know the distribution of the estimator $\hat{\beta}$:
   $$\hat{\beta} \sim N\left(\beta, \sigma^2 (\mathbb{X}^T\mathbb{X})^{-1}\right).$$
     + This can be used to compute p-values and confidence intervals.
   - But when we *don't know* the distribution, or if we *don't want* to assume it follows a normal distribution, we can use bootstrap to make valid inference. 
@@ -206,7 +71,14 @@ hist(cooks.distance(fit2), 20)
   1. Sample with replacement from $(Y_1, \mathbf{X}_1), \ldots, (Y_n, \mathbf{X}_n)$.
   2. Refit the linear model using the bootstrap sample and obtain bootstrap estimates $\hat{\beta}^{(b)}$.
 
-## First example cont'd {.allowframebreaks}
+## First example {.allowframebreaks}
+
+```{r}
+library(DAAG)
+# Recall
+fit1 <- lm(magnetic ~ chemical, data = ironslag)
+```
+
 
 ```{r boot_cases, cache = TRUE}
 n <- nrow(ironslag)
@@ -251,7 +123,19 @@ First, compute residuals $E_i$ and fitted values $\hat{Y}_i = \hat{\beta}^T\math
   2. Add the bootstrapped residuals to the fitted values: $Y^{(b)}_i = \hat{Y}_i + E^{(b)}_i$.
   3. Using these new outcomes $Y^{(b)}_i$ and the original covariates $\mathbf{X}_i$, fit a linear regression model and obtain bootstrap estimates $\hat{\beta}^{(b)}$.
     
-## Second example cont'd {.allowframebreaks}
+## Second example {.allowframebreaks}
+
+```{r}
+library(MASS)
+# Recall
+dataset <- transform(mammals,
+                     log_body = log(body),
+                     log_brain = log(brain))
+
+# Fit model
+fit2 <- lm(log_brain ~ log_body, data = dataset)
+```
+
 
 ```{r boot_resids, cache = TRUE}
 # Compute residuals
