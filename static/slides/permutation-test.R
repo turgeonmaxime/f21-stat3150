@@ -17,20 +17,13 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 
 ## ----message = FALSE----------------------------------------------------------
-library(tidyverse)
-
-ggplot(chickwts, aes(x = feed,
-                     y = weight)) +
-  geom_boxplot()
+boxplot(chickwts$weight ~ chickwts$feed)
 
 
 ## -----------------------------------------------------------------------------
-soy_vec <- filter(chickwts,
-                  feed == "soybean") %>% 
-  pull(weight)
-lin_vec <- filter(chickwts,
-                  feed == "linseed") %>% 
-  pull(weight)
+soy_vec <- chickwts$weight[chickwts$feed == "soybean"]
+lin_vec <- chickwts$weight[chickwts$feed == "linseed"]
+
 c(length(soy_vec), length(lin_vec))
 
 
@@ -39,17 +32,22 @@ c(length(soy_vec), length(lin_vec))
 (fit <- t.test(soy_vec, lin_vec, var.equal = TRUE))
 
 
-## ----boot_chick, message = FALSE, cache = TRUE--------------------------------
+## -----------------------------------------------------------------------------
 # Let's bootstrap
-data <- filter(chickwts, 
-               feed %in% c("soybean", "linseed"))
-n <- nrow(data); B <- 5000
+B <- 5000
+data <- chickwts[chickwts$feed %in% c("soybean", 
+                                      "linseed"), ]
+n <- nrow(data)
 
+
+## ----boot_chick, message = FALSE, cache = TRUE--------------------------------
 results <- replicate(B, {
-  data[sample(n, n, replace = TRUE), ] %>% 
-    group_by(feed) %>% 
-    summarise(mean = mean(weight)) %>% 
-    pull(mean) %>% diff
+  indices <- sample(n, n, replace = TRUE)
+  data_b <- data[indices,]
+  
+  soy_b <- data_b$weight[data_b$feed == "soybean"]
+  lin_b <- data_b$weight[data_b$feed == "linseed"]
+  mean(soy_b) - mean(lin_b)
 })
 
 
@@ -128,9 +126,7 @@ mean(c(D_hat, results3) >= D_hat)
 
 
 ## -----------------------------------------------------------------------------
-sun_vec <- filter(chickwts,
-                  feed == "sunflower") %>% 
-  pull(weight)
+sun_vec <- chickwts$weight[chickwts$feed=="sunflower"]
 c(length(sun_vec), length(lin_vec))
 
 

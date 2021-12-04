@@ -1,0 +1,129 @@
+---
+title: "Fisher's Exact Test"
+draft: false
+source: true
+output: binb::metropolis
+fontsize: 12pt
+author: Max Turgeon
+institute: STAT 3150---Statistical Computing
+header-includes:
+  - \usefonttheme{professionalfonts}
+  - \usepackage{graphicx}
+  - \usepackage{tikzpagenodes}
+  - \usetikzlibrary{calc}
+  - \usepackage{caption}
+---
+
+```{r,setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(cache = FALSE, message = FALSE,
+                      linewidth = 50)
+```
+
+## Lecture Objectives
+
+  - Use Fisher's Exact Tests to test for independence of two categorical variables.
+  - Understand the connection between Fisher's Exact Test and permutation tests.
+
+## Motivation {.allowframebreaks}
+
+  - *The Lady Tasting Tea: How Statistics Revolutionized Science in the Twentieth Century* by David Salsburg
+  - A lady in England claimed she could always tell whether milk or tea was poured in a cup first.
+  - Fisher designed an experiment to test this claim:
+    + He randomly filled four cups with tea first, and four cups with milk first.
+    + He then asked the lady to guess which four cups were filled with milk first.
+    
+\vspace{1cm}
+
+  - Here are the results, summarised in a table:
+  
+|             | Guess Milk | Guess Tea |
+|-------------|:----------:|:---------:|
+| Actual Milk |      3     |     1     |
+| Actual Tea  |      1     |     3     |
+
+  - Fisher's null hypothesis was that the lady was guessing randomly. 
+  - Under this null hypothesis, the value in the top left cell (i.e. correct milk guesses) follows a *hypergeometric distribution*.
+    + We can therefore compute the probability she correctly guessed 3.
+
+```{r echo = TRUE, eval = TRUE}
+dhyper(3, m = 4, n = 4, k = 4)
+```
+   
+   - **What would be a more extreme value?** 
+     + If she had guessed 4 correctly! 
+   - The p-value is the sum of the probability mass function at $x = 3$ and $x = 4$.
+   
+```{r echo = TRUE, eval = TRUE}
+dhyper(3, m = 4, n = 4, k = 4) +
+  dhyper(4, m = 4, n = 4, k = 4)
+```
+
+  - Given that probability, Fisher concluded there was a lack of evidence that the lady could really tell which was poured first.
+  
+## Fisher's Exact Test {.allowframebreaks}
+
+  - Fisher's exact test is a test of independence between two factors 
+    + E.g. the true liquid poured first and the lady's guess.   - It relies on an important assumption:
+    + Both the **row totals** and the **column totals** should be *fixed* by design. 
+  - This was the case in Fisher's experiment: he poured 4 cups of each, and told the lady, so each row and each column in the table above has to sum to 4.
+  
+\vspace{1cm}
+
+  - This assumption is key: 
+    + It implies that the value of a single cell completely determines the value of the other three cells. 
+  - Therefore, any of the four cells is a valid test statistic. 
+  - E.g. if we pick the lower left cell (i.e. wrong milk guesses), we get the same p-value (but note the difference in which values are more extreme!):
+
+```{r echo = TRUE, eval = TRUE}
+dhyper(1, m = 4, n = 4, k = 4) +
+  dhyper(0, m = 4, n = 4, k = 4)
+```
+
+## Permutation tests
+
+  - **What is the connection with permutation tests?** 
+  - Under the null hypothesis, the value of any cell follows a hypergeometric distribution. 
+  - We can quantify the likelihood that a permutation would lead to a valid 2x2 table (i.e. with the correct row and column sums).
+  - As we permute the data, the frequency of each configuration converges to the hypergeometric probabilities.
+
+## Example {.allowframebreaks}
+
+```{r}
+data <- rep(c("Milk", "Tea"), each = 4)
+data
+```
+
+
+```{r}
+results <- replicate(1000, {
+  data_perm <- sample(data)
+  # Treat first 4 values as if the lady 
+  # had guessed milk
+  sum(data_perm[1:4] == "Milk")
+})
+
+mean(c(3, results) >= 3)
+```
+
+  - As we can see, we get a similar p-value.
+
+## Summary
+
+  - Fisher's Exact Test is very much in the same spirit as the permutation tests.
+  - But computational resources were limited.
+    + Fisher couldn't *actually* permute the data.
+    + Instead, he had to compute the probability of each permutation.
+  - **Note**: you can construct a valid permutation test that doesn't rely on the assumption of fixed margins.
