@@ -5,7 +5,7 @@ source: true
 output: binb::metropolis
 fontsize: 12pt
 author: Max Turgeon
-institute: STAT 3150--Statistical Computing
+institute: STAT 3150---Statistical Computing
 header-includes:
   - \usefonttheme{professionalfonts}
   - \usepackage{graphicx}
@@ -34,7 +34,6 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 ## Lecture Objectives
 
-  - Review hypothesis testing.
   - Explain the difference between bootstrap and permutation tests.
   - Apply permutation tests to two-sample problems.
 
@@ -46,45 +45,21 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
   - **Permutation tests** are a whole family of resampling strategies that can be used specifically for hypothesis testing.
     + And there are generally more powerful than bootstrap.
     
-## Recall: Hypothesis testing {.allowframebreaks}
-
-  - We will quickly recall some important concepts from hypothesis testing.
-    + These were also discussed in the interactive tutorial `MCinference`
-  - An **estimator** is a statistic that we use to estimate/approximate/learn about a parameter of interest $\theta$.
-  - In hypothesis testing, we start with a **null hypothesis** about our parameter $\theta$:
-  $$H_0: \theta = \theta_0.$$
-  
-\vspace{1cm}
-  
-  - We then use a **test statistic** to determine whether we should reject or not the null hypothesis.
-    + A test statistic can also be an estimator, but more often it's a transformation thereof.
-  - If we know the sampling distribution of our test statistic when $H_0$ holds (i.e. $\theta = \theta_0$), then we can compute *how likely* it is to observe some given values of a test statistic.
-  - This gives rise to the notion of a **p-value**: if your test statistic is $T$, and the observed value (i.e. after you've plugged in your data) is $t$, then the p-value is the following conditional probability:
-  $$P(T > t \mid H_0\mbox{ hold}).$$
-  - Finally, we can reject the null hypothesis if the p-value is smaller than a predetermined level of significance $\alpha$.
-    
 ## Motivating example---T test {.allowframebreaks}
 
   - We will use the `chickwts` dataset (available in base `R`).
   - Contains 71 observations: chick weight, and the type of feed use.
   
 ```{r message = FALSE}
-library(tidyverse)
-
-ggplot(chickwts, aes(x = feed,
-                     y = weight)) +
-  geom_boxplot()
+boxplot(chickwts$weight ~ chickwts$feed)
 ```
 
   - We will focus on two types of feed: *soybean* and *linseed*
     
 ```{r}
-soy_vec <- filter(chickwts,
-                  feed == "soybean") %>% 
-  pull(weight)
-lin_vec <- filter(chickwts,
-                  feed == "linseed") %>% 
-  pull(weight)
+soy_vec <- chickwts$weight[chickwts$feed == "soybean"]
+lin_vec <- chickwts$weight[chickwts$feed == "linseed"]
+
 c(length(soy_vec), length(lin_vec))
 ```
 
@@ -114,17 +89,23 @@ c(length(soy_vec), length(lin_vec))
     + Construct the t-statistic $t = \frac{\hat{\mu}_S - \hat{\mu}_L}{\hat{\sigma}\sqrt{n_S^{-1} + n_L^{-1}}}$.
   - If the null hypothesis holds and if **the weights are normally distributed with the same variance**, then $t$ follows a t distribution on $n_S + n_L - 2$ degrees of freedom.
     
-```{r boot_chick, message = FALSE, cache = TRUE}
+```{r}
 # Let's bootstrap
-data <- filter(chickwts, 
-               feed %in% c("soybean", "linseed"))
-n <- nrow(data); B <- 5000
+B <- 5000
+data <- chickwts[chickwts$feed %in% c("soybean", 
+                                      "linseed"), ]
+n <- nrow(data)
+```
 
+
+```{r boot_chick, message = FALSE, cache = TRUE}
 results <- replicate(B, {
-  data[sample(n, n, replace = TRUE), ] %>% 
-    group_by(feed) %>% 
-    summarise(mean = mean(weight)) %>% 
-    pull(mean) %>% diff
+  indices <- sample(n, n, replace = TRUE)
+  data_b <- data[indices,]
+  
+  soy_b <- data_b$weight[data_b$feed == "soybean"]
+  lin_b <- data_b$weight[data_b$feed == "linseed"]
+  mean(soy_b) - mean(lin_b)
 })
 ```
 
@@ -145,13 +126,12 @@ c(mu_diff - 1.96*se_boot, mu_diff + 1.96*se_boot)
   where $F,G$ are the distribution functions of two different samples.
   - You can see this as a *generalization* of the t-test in two ways:
     + We replace equality of means by equality of distributions.
-    + We don't assume the data follows a uniform distribution.
+    + We don't assume the data follows a normal distribution.
 
 \vspace{1cm}
 
   - It can also be used to test for **independence**:
     + If we have two variables $X,Y$, with $F_X,F_Y$ the marginal distributions and $F_{XY}$ the joint distribution, independence is equivalent to $F_{XY} = F_XF_Y$.
-    + See interactive tutorial `permutation`.
   - The main idea is as follows: 
     - Let $X_1, \ldots, X_n\sim F$ and $Y_1, \ldots, Y_m \sim G$.
     - If $H_0:F=G$ holds, then $X_1, \ldots, X_n, Y_1, \ldots, Y_m \sim F$.
@@ -171,7 +151,7 @@ Let $N = n+m$, and let $\hat{\theta}$ be the estimate for the original sample.
 ## A few observations {.allowframebreaks}
 
   - The procedure is usually considered *approximate*, because we are not using all possible permutations.
-    + In practice, 1000 permutations will give a good approximation.
+    + In practice, 1000 permutations will give a good approximation for $\alpha = 0.05$.
   - Assume that our estimator is the difference of means, like in the motivating example. To compute the permuted estimate $\hat{\theta}^{(k)}$, we compute the sample mean of the first $n$ observations, the sample mean of the remaining $m$ observations, and take the difference.
     + Remember: under the null hypothesis, group membership is meaningless!
     
@@ -269,9 +249,7 @@ mean(c(D_hat, results3) >= D_hat)
   - We will use the same dataset, but compare sunflower and linseed feeds.
   
 ```{r}
-sun_vec <- filter(chickwts,
-                  feed == "sunflower") %>% 
-  pull(weight)
+sun_vec <- chickwts$weight[chickwts$feed=="sunflower"]
 c(length(sun_vec), length(lin_vec))
 ```
 

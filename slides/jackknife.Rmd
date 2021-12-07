@@ -5,7 +5,7 @@ source: true
 output: binb::metropolis
 fontsize: 12pt
 author: Max Turgeon
-institute: STAT 3150--Statistical Computing
+institute: STAT 3150---Statistical Computing
 header-includes:
   - \usefonttheme{professionalfonts}
   - \usepackage{graphicx}
@@ -155,7 +155,7 @@ mean(patch$y/patch$z)
 ## Estimate of the standard error
 
   - The jackknife can also be used to estimate the standard error of an estimate:
-  $$\widehat{\mathrm{se}}_{jack} = \sqrt{\frac{n-1}{n}\sum_{i=1}^n\left(\hat{\theta}_{(i)} - \frac{1}{n}\sum_{i=1}^n\hat{\theta}_{(i)}\right)^2}.$$
+  $$\widehat{\mathrm{se}}_{jack} = \sqrt{\left(\frac{n-1}{n}\right)\sum_{i=1}^n\left(\hat{\theta}_{(i)} - \frac{1}{n}\sum_{i=1}^n\hat{\theta}_{(i)}\right)^2}.$$
   
 ## Example (cont'd)
 
@@ -219,5 +219,5 @@ c("LB" = rho_hat - bias - 1.96*se,
     + The "debiased" estimate is generally only asymptotically unbiased. But its bias goes to 0 "more quickly" than the bias of the original estimator.
     + The jackknife only works well for "smooth plug-in estimators". In particular, the jackknife does **not** work well with the median.
   - The jackknife was generalized in two important ways:
-    + **Bootstrap**: This will be the main topic for next week.
+    + **Bootstrap**: This will be the topic of the next lecture.
     + **Cross-validation**: This is a method for estimating the prediction error (see STAT 4250).

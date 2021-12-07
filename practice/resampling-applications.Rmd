@@ -1,0 +1,79 @@
+---
+title: "Practice problems--Resampling Applications"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+Consider the `nuclear dataset` from the `boot` package:
+
+```
+The nuclear data frame has 32 rows and 11 columns.
+
+The data relate to the construction of 32 light water reactor (LWR) plants constructed 
+in the U.S.A in the late 1960’s and early 1970’s. The data was collected with the aim 
+of predicting the cost of construction of further LWR plants. 6 of the power plants had 
+partial turnkey guarantees and it is possible that, for these plants, some manufacturers’ 
+subsidies may be hidden in the quoted capital costs.
+```
+
+For more details about each variable, have a look at `?boot::nuclear`.
+
+We will look at the following model for the log-cost of a nuclear station:
+
+```{r}
+library(boot)
+nuclear_fit <- lm(log(cost) ~ date + log(t1) + log(t2) + log(cap) + pr +
+                      ne + ct + bw + log(cum.n) + pt, 
+                  data = nuclear)
+
+summary(nuclear_fit)
+```
+
+  a. Perform a residual analysis for this linear regression model fit.
+  b. Use bootstrap to construct a 95% confidence interval for the regression coefficient corresponding to date. Be explicit about the type of resampling you chose, the type of confidence interval you chose, and the reason why you made those choices.
+  c. Use bootstrap to build a 95% confidence interval for the expected cost (i.e. on the original scale) for the nuclear plant corresponding to the 32nd observation (i.e. row 32 in boot::nuclear.)
+  d. Repeat the above, but for a new observation that has the same covariate values as the 32nd observation, except for date, which should be equal to 73.
+  
+## Problem 2
+
+Consider the `salinity` dataset in the `boot` package:
+
+```
+The salinity data frame has 28 rows and 4 columns.
+
+Biweekly averages of the water salinity and river discharge in Pamlico Sound, North Carolina 
+were recorded between the years 1972 and 1977. The data in this set consists only of those 
+measurements in March, April and May.
+```
+
+For more details about each variable, have a look at `?boot::salinity`.
+
+We will look at the following model for the salinity level:
+
+```{r}
+library(boot)
+sal_fit <- lm(sal ~ lag + trend + dis,
+              data = salinity)
+
+summary(sal_fit)
+```
+
+  a. Perform a residual analysis for this linear regression model fit.
+  b. Use bootstrap to construct a 95% confidence interval for the regression coefficient corresponding to dis. Be explicit about the type of resampling you chose, the type of confidence interval you chose, and the reason why you made those choices.
+  
+## Problem 3
+
+For this problem, use the `catsM` data in the `boot` package. This dataset contains weight data for 97 adult domestic cats.
+
+  a. Display a fitted line plot for the simple linear regression model where body weight (`Bwt`) is the outcome variable, and heart weight (`Hwt`) is the covariate.
+  b. Display a plot of residuals vs. fitted values.
+  c. Comment on the fit of this model. Are there any outliers? If so, identify these points by observation number.
+  d. Based on your analysis above, to analyze the fit using bootstrap, choose a resampling method (i.e. resampling cases or errors) and explain your reasoning.
+  e. Bootstrap the slopes of this model and obtain a bootstrap estimate the standard error of $\hat{\beta}_1$.
+  f. Compute a 95% bootstrap confidence interval using the method of your choice.
+  

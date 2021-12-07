@@ -18,68 +18,8 @@ knitr::opts_chunk$set(cache = FALSE, message = FALSE,
 
 ## -----------------------------------------------------------------------------
 library(DAAG)
-library(ggplot2)
-
-# Fit model
-fit1 <- lm(magnetic ~ chemical, data=ironslag)
-coef(fit1)
-
-
-## -----------------------------------------------------------------------------
-# Plot fitted linear trend
-ggplot(ironslag, aes(chemical, magnetic)) +
-  geom_point() + 
-  geom_abline(intercept = coef(fit1)[1],
-              slope = coef(fit1)[2])
-
-
-## -----------------------------------------------------------------------------
-# Fitted against residuals
-plot(fitted(fit1), resid(fit1)) 
-abline(h = 0)
-
-
-## -----------------------------------------------------------------------------
-# Histogram of student residuals
-hist(rstudent(fit1), 20)
-
-
-## -----------------------------------------------------------------------------
-# Histogram of Cook's distance
-hist(cooks.distance(fit1), 20)
-
-
-## -----------------------------------------------------------------------------
-library(MASS)
-library(ggplot2)
-
-# Fit model
-fit2 <- lm(log(brain) ~ log(body), data = mammals)
-coef(fit2)
-
-
-## -----------------------------------------------------------------------------
-# Plot fitted linear trend
-ggplot(mammals, aes(log(body), log(brain))) +
-  geom_point() + 
-  geom_abline(intercept = coef(fit2)[1],
-              slope = coef(fit2)[2])
-
-
-## -----------------------------------------------------------------------------
-# Fitted against residuals
-plot(fitted(fit2), resid(fit2)) 
-abline(h = 0)
-
-
-## -----------------------------------------------------------------------------
-# Histogram of student residuals
-hist(rstudent(fit2), 20)
-
-
-## -----------------------------------------------------------------------------
-# Histogram of Cook's distance
-hist(cooks.distance(fit2), 20)
+# Recall
+fit1 <- lm(magnetic ~ chemical, data = ironslag)
 
 
 ## ----boot_cases, cache = TRUE-------------------------------------------------
@@ -105,6 +45,17 @@ cbind("Lower" = coef(fit1) - 1.96*c(se_int, se_slope),
 ## -----------------------------------------------------------------------------
 # Compare to MLE theory
 confint(fit1)
+
+
+## -----------------------------------------------------------------------------
+library(MASS)
+# Recall
+dataset <- transform(mammals,
+                     log_body = log(body),
+                     log_brain = log(brain))
+
+# Fit model
+fit2 <- lm(log_brain ~ log_body, data = dataset)
 
 
 ## ----boot_resids, cache = TRUE------------------------------------------------
