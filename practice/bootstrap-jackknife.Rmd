@@ -106,7 +106,7 @@ For this problem, we are interested in the first element of the vector above, wh
 
 Conduct a Monte Carlo study to estimate the coverage probabilities of the standard normal bootstrap confidence interval, the basic bootstrap confidence interval, and the percentile confidence interval. Sample from a **log-normal** population of your choice and check the empirical coverage rates for the **sample mean**. This means you need to choose $\mu$, $\sigma^2$, and the sample size $n$.
 
-Find the proportion of times that the confidence intervals miss on the left (i.e. the true value $\mu$ is to the left of both bounds), and the proportion of times that the confidence intervals miss on the right (i.e. the true value $\mu$ is to the right of both bounds).
+Find the proportion of times that the confidence intervals miss on the left (i.e. the true value is to the left of both bounds), and the proportion of times that the confidence intervals miss on the right (i.e. the true value is to the right of both bounds). Note that $\mu$ is **not** equal to the mean of a log-normal distribution.
 
 Discuss the results.
 
